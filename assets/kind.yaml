@@ -1,0 +1,49 @@
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+networking:
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"
+  # apiServerAddress: "192.168.100.1"
+nodes:
+- role: control-plane
+  image: kindest/node:v1.32.2
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  - |
+    kind: KubeProxyConfiguration
+    metricsBindAddress: "0.0.0.0:10249"
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        enable-admission-plugins: "NodeRestriction"
+    controllerManager:
+      extraArgs:
+        bind-address: "0.0.0.0"
+        secure-port: "10257"
+    scheduler:
+      extraArgs:
+        bind-address: "0.0.0.0"
+    etcd:
+      local:
+        extraArgs: 
+          listen-metrics-urls: "http://0.0.0.0:2381"
+
+  extraPortMappings:
+  - containerPort: 30080
+    hostPort: 80
+    protocol: TCP
+    listenAddress: "0.0.0.0"
+  - containerPort: 30443
+    hostPort: 443
+    protocol: TCP
+    listenAddress: "0.0.0.0"
+- role: worker
+  image: kindest/node:v1.32.2
+- role: worker
+  image: kindest/node:v1.32.2
+  

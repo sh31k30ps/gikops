@@ -1,0 +1,13 @@
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Gikops
+./core/**/base/**
+./components/**/base/**
+./project/**/base/**
+computed.yaml
+
+!./**/kustomization.yaml
+!./**/.gitkeep
