@@ -26,6 +26,7 @@ func NewCommand(logger log.Logger) *cobra.Command {
 	cmd.AddCommand(
 		newInitCmd(logger),
 		newApplyCmd(logger),
+		newCheckCmd(logger),
 	)
 
 	return cmd
@@ -66,7 +67,7 @@ func validArgsFunction(cmd *cobra.Command, args []string, toComplete string) ([]
 func getComponents(folder string, all bool, args []string) ([]string, error) {
 	projectCfg, _ := pkg.GetCurrentProject()
 	if projectCfg == nil {
-		return nil, fmt.Errorf("project filenot found")
+		return nil, fmt.Errorf("project file not found")
 	}
 
 	if folder == "" {
