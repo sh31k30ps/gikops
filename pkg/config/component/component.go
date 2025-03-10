@@ -25,14 +25,16 @@ func NewComponent() *Component {
 }
 
 type ComponentFiles struct {
-	CRDs string
-	Keep []string
+	CRDs     string
+	SkipCRDs bool
+	Keep     []string
 }
 
 func NewComponentFiles() *ComponentFiles {
 	return &ComponentFiles{
-		CRDs: "",
-		Keep: []string{},
+		CRDs:     "",
+		SkipCRDs: false,
+		Keep:     []string{},
 	}
 }
 

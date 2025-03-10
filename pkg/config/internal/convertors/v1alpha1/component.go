@@ -171,6 +171,7 @@ func ConvertV1Alpha1ToComponentHelmInitHooksConcats(in []v1alpha1.Concat) []comp
 func ConvertV1Alpha1ToComponentFiles(in *v1alpha1.ComponentFiles, out *component.ComponentFiles) {
 	out.CRDs = in.CRDs
 	out.Keep = in.Keep
+	out.SkipCRDs = in.SkipCRDs
 }
 
 func ConvertV1Alpha1ToComponentExec(in *v1alpha1.ComponentExec, out *component.ComponentExec) {
@@ -283,6 +284,7 @@ func ConvertComponentHookConcatsToV1Alpha1(in []component.HelmHookConcat, out []
 func ConvertComponentFilesToV1Alpha1(in *component.ComponentFiles, out *v1alpha1.ComponentFiles) {
 	out.CRDs = in.CRDs
 	out.Keep = in.Keep
+	out.SkipCRDs = in.SkipCRDs
 }
 
 func ConvertComponentExecToV1Alpha1(in *component.ComponentExec, out *v1alpha1.ComponentExec) {

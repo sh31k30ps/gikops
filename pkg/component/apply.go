@@ -75,14 +75,16 @@ func (m *Manager) ApplyComponent(componentName, env string) error {
 }
 
 func (m *Manager) applySingleCRDs(name string, env string) error {
-	if err := kubectl.ChangeContext(env); err != nil {
-		return fmt.Errorf("failed to change context: %w", err)
-	}
 	cfg, err := pkg.GetComponent(name)
 	if err != nil {
 		return fmt.Errorf("failed to get component: %w", err)
 	}
-
+	if cfg.Files.SkipCRDs {
+		return nil
+	}
+	if err := kubectl.ChangeContext(env); err != nil {
+		return fmt.Errorf("failed to change context: %w", err)
+	}
 	if err := kubectl.CreateCRDs(filepath.Join(name, "base", cfg.Files.CRDs)); err != nil {
 		return err
 	}
