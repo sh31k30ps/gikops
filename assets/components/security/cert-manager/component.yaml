@@ -1,0 +1,19 @@
+kind: Component
+apiVersion: gikopsctl.config.k8s.io/v1alpha1
+metadata:
+  name: cert-manager
+  # disabled: true
+  namespace: cert-manager
+dependsOn:
+  - core/prometheus
+helm:
+  repo: jetstack
+  repo-url: https://charts.jetstack.io
+  version: v1.17.1
+  chart: jetstack/cert-manager
+  after:
+    uploads:
+    - name: cert-manager.crds.yaml
+      url: https://github.com/cert-manager/cert-manager/releases/download/v1.17.1/cert-manager.crds.yaml
+files:
+  crds: cert-manager.crds.yaml
