@@ -3,7 +3,9 @@ package component
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"sync"
 
 	"github.com/sh31k30ps/gikopsctl/pkg"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
@@ -130,9 +132,21 @@ func (m *Manager) applySingleComponent(name, env string) error {
 	os.Chdir(fmt.Sprintf("%s/%s", name, env))
 	defer os.Chdir(currentDir)
 
+	if cfg.Exec != nil && len(cfg.Exec.Before) > 0 {
+		for _, command := range cfg.Exec.Before {
+			m.logger.V(1).Info(fmt.Sprintf("Running before script: %s", command))
+			if err := exec.Command("sh", "-c", command).Run(); err != nil {
+				return fmt.Errorf("failed to run before script: %w", err)
+			}
+		}
+	}
+
+	m.logger.V(1).Info("Building")
 	if err := kustomize.Build(name); err != nil {
 		return fmt.Errorf("failed to build: %w", err)
 	}
+
+	m.logger.V(1).Info("Applying")
 	if err := kubectl.Apply("computed.yaml"); err != nil {
 		return fmt.Errorf("failed to apply: %w", err)
 	}
@@ -140,6 +154,18 @@ func (m *Manager) applySingleComponent(name, env string) error {
 	if err := m.waitResources(); err != nil {
 		return fmt.Errorf("failed to wait for resources: %w", err)
 	}
+
+	if cfg.Exec != nil && len(cfg.Exec.After) > 0 {
+		for _, command := range cfg.Exec.After {
+			m.logger.V(1).Info(fmt.Sprintf("Running after script: %s", command))
+			if err := exec.Command("sh", "-c", command).Run(); err != nil {
+				return fmt.Errorf("failed to run after script: %w", err)
+			}
+		}
+	}
+
+	return nil
+}
 
 func (m *Manager) waitResources() error {
 	pg, err := getPodsGeneratorsFromFile("computed.yaml")
