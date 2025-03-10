@@ -1,0 +1,15 @@
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# vscode
+.vscode/** 
+!launch.json
+
+# go
+vendor
+bin
+coverage.out
+coverage.html
+test
