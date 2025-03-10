@@ -137,5 +137,47 @@ func (m *Manager) applySingleComponent(name, env string) error {
 		return fmt.Errorf("failed to apply: %w", err)
 	}
 
+	if err := m.waitResources(); err != nil {
+		return fmt.Errorf("failed to wait for resources: %w", err)
+	}
+
+func (m *Manager) waitResources() error {
+	pg, err := getPodsGeneratorsFromFile("computed.yaml")
+	if err != nil {
+		return fmt.Errorf("failed to get pods generators: %w", err)
+	}
+
+	var wg sync.WaitGroup
+	var errChan = make(chan error, len(pg.GetDeployments())+len(pg.GetDaemonsets())+len(pg.GetStatefulsets()))
+	waitResources := func(resources []string) {
+		m.logger.V(1).Info(fmt.Sprintf("Waiting for resources %s to be ready", resources))
+		defer wg.Done()
+		if err := kubectl.WaittingForResourcesBeReady(resources); err != nil {
+			errChan <- fmt.Errorf("error waiting for resource %s: %w", resources, err)
+		}
+		m.logger.V(1).Info(fmt.Sprintf("Resources %s are ready", resources))
+	}
+
+	if len(pg.GetDeployments()) > 0 {
+		wg.Add(1)
+		go waitResources(pg.GetDeployments())
+	}
+	if len(pg.GetDaemonsets()) > 0 {
+		wg.Add(1)
+		go waitResources(pg.GetDaemonsets())
+	}
+	if len(pg.GetStatefulsets()) > 0 {
+		wg.Add(1)
+		go waitResources(pg.GetStatefulsets())
+	}
+
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+
+	for err := range errChan {
+		return err
+	}
 	return nil
 }

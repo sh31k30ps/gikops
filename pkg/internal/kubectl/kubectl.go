@@ -69,3 +69,14 @@ func Apply(file string) error {
 	}
 	return nil
 }
+
+func WaittingForResourcesBeReady(resources []string) error {
+	args := []string{"rollout", "status", "--timeout=2m"}
+	args = append(args, resources...)
+	cmd := exec.Command("kubectl", args...)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to wait for resource to be ready: %s: %w", string(output), err)
+	}
+
+	return nil
+}
