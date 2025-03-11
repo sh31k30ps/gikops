@@ -16,8 +16,7 @@ func LoadProject(file string) (*project.Project, []error) {
 		return nil, []error{fmt.Errorf("error loading project: %w", err)}
 	}
 	if p, ok := p.(*project.Project); ok {
-		project.SetProjectDefaults(p)
-		return p, project.ValidateProject(*p)
+		return p, nil
 	}
 	return nil, []error{fmt.Errorf("invalid project configuration")}
 }

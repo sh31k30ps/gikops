@@ -1,9 +1,8 @@
 package component
 
 import (
+	"github.com/sh31k30ps/gikopsctl/pkg/cli"
 	"github.com/sh31k30ps/gikopsctl/pkg/log"
-
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/cli"
 )
 
 type ApplyMode string

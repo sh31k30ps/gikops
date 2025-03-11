@@ -15,13 +15,10 @@ type Project struct {
 	Metadata *ProjectMetadata `json:"metadata,omitempty" yaml:"metadata,omitempty"`
 
 	// ComponentsFolders is a list of folders containing component configurations
-	Components *ProjectComponents `json:"components,omitempty" yaml:"components,omitempty"`
+	Components []ProjectComponent `json:"components,omitempty" yaml:"components,omitempty"`
 
 	// ClusterLocal contains the local cluster configuration
-	ClusterLocal *ClusterLocal `json:"clusterLocal,omitempty" yaml:"clusterLocal,omitempty"`
-
-	// Environments is a list of environments for the project
-	Environments []string `json:"environments,omitempty" yaml:"environments,omitempty"`
+	Clusters []Cluster `json:"clusters,omitempty" yaml:"clusters,omitempty"`
 }
 
 // ProjectMetadata contains metadata for the project
@@ -32,9 +29,10 @@ type ProjectMetadata struct {
 }
 
 // ProjectComponents contains the components for the project
-type ProjectComponents struct {
+type ProjectComponent struct {
 	// Folders is a list of folders containing component configurations
-	Folders []string `json:"folders,omitempty" yaml:"folders,omitempty"`
-	// FileName is the name of the file containing the component configurations
-	FileName string `json:"fileName,omitempty" yaml:"fileName,omitempty"`
+	Name string `json:"name,omitempty" yaml:"name,omitempty"`
+
+	// Require is a list of components that are required by the component
+	Require []string `json:"require,omitempty" yaml:"require,omitempty"`
 }

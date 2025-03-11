@@ -2,7 +2,7 @@ package component
 
 import "errors"
 
-func ValidateComponent(c Component) []error {
+func Validate(c Component) []error {
 	var errs []error
 	if c.Name == "" {
 		errs = append(errs, errors.New("component name is required"))

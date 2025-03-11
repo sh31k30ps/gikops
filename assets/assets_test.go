@@ -19,7 +19,7 @@ func TestGetKindConfig(t *testing.T) {
 }
 
 func TestGetComponentFiles(t *testing.T) {
-	files, err := GetComponentFiles()
+	files, err := GetComponentsFiles()
 	if err != nil {
 		t.Errorf("GetComponentFiles() error = %v", err)
 		return

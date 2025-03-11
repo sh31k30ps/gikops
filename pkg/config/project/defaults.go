@@ -1,44 +1,32 @@
 package project
 
-import "github.com/sh31k30ps/gikopsctl/pkg/config/component"
-
 func SetProjectDefaults(p *Project) {
 	if p == nil {
 		p = NewProject()
 	}
-	SetProjectComponentsDefaults(p.Components)
-	SetKindClusterDefaults(p.LocalCluster)
-	if len(p.Environments) == 0 {
-		p.Environments = []string{"local"}
+	if len(p.Clusters) == 0 {
+		cluster := NewKindCluster()
+		p.Clusters = []ProjectCluster{cluster}
 	}
-}
 
-func SetProjectComponentsDefaults(c *ProjectComponents) {
-	if c == nil {
-		c = NewProjectComponents()
-	}
-	if c.FileName == "" {
-		c.FileName = component.ComponentFileName
-	}
-	if len(c.Folders) == 0 {
-		c.Folders = []string{
-			"components",
-			"core",
+	for _, cl := range p.Clusters {
+		switch c := cl.(type) {
+		case *KindCluster:
+			SetKindClusterDefaults(c)
 		}
 	}
 }
 
 func SetKindClusterDefaults(c *KindCluster) {
-	if c == nil {
-		c = NewKindCluster()
+	cfg := c.Config().(*KindConfig)
+	if cfg == nil {
+		cfg = NewKindConfig()
 	}
-	SetKindConfigDefaults(c.KindConfig)
+	SetKindConfigDefaults(cfg)
+	c.SetConfig(cfg)
 }
 
 func SetKindConfigDefaults(c *KindConfig) {
-	if c == nil {
-		c = NewKindConfig()
-	}
 	if c.ConfigFile == "" {
 		c.ConfigFile = DefaultKindConfigFile
 	}

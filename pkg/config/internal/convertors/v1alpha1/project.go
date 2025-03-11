@@ -29,7 +29,15 @@ func (c *ProjectConverter) FromFile(config encoding.ConfigFile) (encoding.Config
 		return nil, fmt.Errorf("no project configuration provided")
 	}
 	if config, ok := config.(*v1alpha1.Project); ok {
-		return ConvertV1Alpha1ToProject(config)
+		cfg, err := ConvertV1Alpha1ToProject(config)
+		if err != nil {
+			return nil, err
+		}
+		errs := c.Validate(cfg)
+		if len(errs) > 0 {
+			return cfg, fmt.Errorf("invalid project configuration")
+		}
+		return cfg, nil
 	}
 	return nil, fmt.Errorf("invalid project configuration")
 }
@@ -39,7 +47,7 @@ func (c *ProjectConverter) Validate(config encoding.ConfigObject) []error {
 		return []error{fmt.Errorf("no project configuration provided")}
 	}
 	if config, ok := config.(*project.Project); ok {
-		return project.ValidateProject(*config)
+		return project.Validate(*config)
 	}
 	return []error{fmt.Errorf("invalid project configuration")}
 }
@@ -61,35 +69,48 @@ func ConvertV1Alpha1ToProject(cfg *v1alpha1.Project) (*project.Project, error) {
 		return nil, fmt.Errorf("no project configuration provided")
 	}
 	cfg = cfg.DeepCopy()
-	v1alpha1.SetProjectDefaults(cfg)
 
 	p := project.NewProject()
 	p.Name = cfg.Metadata.Name
 
-	if cfg.Components != nil {
-		ConvertV1Alpha1ToProjectComponents(cfg.Components, p.Components)
-	}
-	if cfg.ClusterLocal != nil {
-		ConvertV1Alpha1ToKindCluster(cfg.ClusterLocal, p.LocalCluster)
-	}
-	if cfg.Environments != nil {
-		p.Environments = cfg.Environments
+	if len(cfg.Components) > 0 {
+		p.Components = make([]project.ProjectComponent, len(cfg.Components))
+		for i, component := range cfg.Components {
+			ConvertV1Alpha1ToProjectComponent(&component, &p.Components[i])
+		}
 	}
 
+	if len(cfg.Clusters) > 0 {
+		p.Clusters = make([]project.ProjectCluster, len(cfg.Clusters))
+		for i, cluster := range cfg.Clusters {
+			if cluster.KindConfig != nil {
+				p.Clusters[i] = project.NewKindCluster()
+				ConvertV1Alpha1ToKindCluster(&cluster, p.Clusters[i].(*project.KindCluster))
+			} else {
+				p.Clusters[i] = project.NewBasicCluster()
+				p.Clusters[i].(*project.BasicCluster).SetName(cluster.Name)
+			}
+		}
+	}
+	project.SetProjectDefaults(p)
 	return p, nil
 }
 
-func ConvertV1Alpha1ToProjectComponents(in *v1alpha1.ProjectComponents, out *project.ProjectComponents) {
-	out.Folders = in.Folders
-	out.FileName = in.FileName
-}
-
-func ConvertV1Alpha1ToKindCluster(in *v1alpha1.ClusterLocal, out *project.KindCluster) {
+func ConvertV1Alpha1ToProjectComponent(in *v1alpha1.ProjectComponent, out *project.ProjectComponent) {
 	out.Name = in.Name
-	ConvertV1Alpha1ToKindConfig(in.KindConfig, out.KindConfig)
+	out.Require = in.Require
 }
 
-func ConvertV1Alpha1ToKindConfig(in *v1alpha1.ClusterLocalKindConfig, out *project.KindConfig) {
+func ConvertV1Alpha1ToKindCluster(in *v1alpha1.Cluster, out *project.KindCluster) {
+	out.SetName(in.Name)
+	if in.KindConfig != nil {
+		cfg := project.NewKindConfig()
+		ConvertV1Alpha1ToKindConfig(in.KindConfig, cfg)
+		out.SetConfig(cfg)
+	}
+}
+
+func ConvertV1Alpha1ToKindConfig(in *v1alpha1.ClusterKindConfig, out *project.KindConfig) {
 	out.ConfigFile = in.ConfigFile
 	out.OverridesFolder = in.OverridesFolder
 	out.Provider = project.KindConfigProvider(in.Provider)
@@ -99,41 +120,57 @@ func ConvertProjectToV1Alpha1(cfg *project.Project) (*v1alpha1.Project, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("no project configuration provided")
 	}
-
+	project.SetProjectDefaults(cfg)
 	p := &v1alpha1.Project{
-		TypeMeta: v1alpha1.TypeMeta{
-			APIVersion: v1alpha1.Version,
-			Kind:       v1alpha1.ProjectKind,
-		},
 		Metadata: &v1alpha1.ProjectMetadata{
 			Name: cfg.Name,
 		},
 	}
-	if cfg.Components != nil {
-		p.Components = &v1alpha1.ProjectComponents{}
-		ConvertProjectComponentsToV1Alpha1(cfg.Components, p.Components)
+
+	if len(cfg.Clusters) > 0 {
+		p.Clusters = make([]v1alpha1.Cluster, len(cfg.Clusters))
+		for i, c := range cfg.Clusters {
+			ConvertClusterToV1Alpha1(c, &p.Clusters[i])
+		}
 	}
-	if cfg.LocalCluster != nil {
-		p.ClusterLocal = &v1alpha1.ClusterLocal{}
-		ConvertKindClusterToV1Alpha1(cfg.LocalCluster, p.ClusterLocal)
+
+	if len(cfg.Components) > 0 {
+		p.Components = make([]v1alpha1.ProjectComponent, len(cfg.Components))
+		for i, c := range cfg.Components {
+			ConvertProjectComponentToV1Alpha1(c, &p.Components[i])
+		}
 	}
 	v1alpha1.SetProjectDefaults(p)
 	return p, nil
 }
 
-func ConvertProjectComponentsToV1Alpha1(in *project.ProjectComponents, out *v1alpha1.ProjectComponents) {
-	out.Folders = in.Folders
-	out.FileName = in.FileName
+func ConvertProjectComponentToV1Alpha1(in project.ProjectComponent, out *v1alpha1.ProjectComponent) {
+	out.Name = in.Name
+	out.Require = in.Require
 }
 
-func ConvertKindClusterToV1Alpha1(in *project.KindCluster, out *v1alpha1.ClusterLocal) {
-	if in.KindConfig != nil {
-		out.KindConfig = &v1alpha1.ClusterLocalKindConfig{}
-		ConvertKindConfigToV1Alpha1(in.KindConfig, out.KindConfig)
+func ConvertClusterToV1Alpha1(in project.ProjectCluster, out *v1alpha1.Cluster) {
+	switch c := in.(type) {
+	case *project.KindCluster:
+		ConvertKindClusterToV1Alpha1(c, out)
+	case *project.BasicCluster:
+		out.Name = c.Name()
+	default:
 	}
 }
 
-func ConvertKindConfigToV1Alpha1(in *project.KindConfig, out *v1alpha1.ClusterLocalKindConfig) {
+func ConvertKindClusterToV1Alpha1(in *project.KindCluster, out *v1alpha1.Cluster) {
+	if in == nil {
+		return
+	}
+	out.Name = in.Name()
+	if in.Config() != nil {
+		out.KindConfig = &v1alpha1.ClusterKindConfig{}
+		ConvertKindConfigToV1Alpha1(in.Config().(*project.KindConfig), out.KindConfig)
+	}
+}
+
+func ConvertKindConfigToV1Alpha1(in *project.KindConfig, out *v1alpha1.ClusterKindConfig) {
 	out.ConfigFile = in.ConfigFile
 	out.OverridesFolder = in.OverridesFolder
 	out.Provider = string(in.Provider)

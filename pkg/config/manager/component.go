@@ -65,10 +65,7 @@ func getComponentFile(file string) string {
 func GetComponentFileName(cfg *project.Project) string {
 	comptName := os.Getenv(component.ComponentFileEnvVar)
 	if comptName == "" {
-		comptName = cfg.Components.FileName
-	}
-	if comptName == "" {
-		comptName = component.DefaultComponentFile
+		comptName = component.ComponentFileName
 	}
 	return comptName
 }

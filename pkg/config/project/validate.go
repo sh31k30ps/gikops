@@ -4,46 +4,70 @@ import (
 	"errors"
 )
 
-func ValidateProject(p Project) []error {
+func Validate(p Project) []error {
 	var errs []error
 	if p.Name == "" {
 		errs = append(errs, errors.New("project name is required"))
 	}
-	if p.Components == nil {
-		errs = append(errs, errors.New("project components are required"))
-	} else {
-		errs = append(errs, ValidateProjectComponents(*p.Components)...)
+	if len(p.Clusters) == 0 {
+		errs = append(errs, errors.New("a project cluster must be defined"))
 	}
-	if p.LocalCluster == nil {
-		errs = append(errs, errors.New("project local cluster is required"))
-	} else {
-		errs = append(errs, ValidateKindCluster(*p.LocalCluster)...)
+	visitedClusters := make(map[string]bool)
+	for _, cluster := range p.Clusters {
+		errs = append(errs, ValidateCluster(cluster)...)
+		if visitedClusters[cluster.Name()] {
+			errs = append(errs, errors.New("cluster name must be unique"))
+		}
+		visitedClusters[cluster.Name()] = true
+	}
+	visitedComponents := make(map[string]bool)
+	for _, component := range p.Components {
+		errs = append(errs, ValidateProjectComponent(component)...)
+		if visitedComponents[component.Name] {
+			errs = append(errs, errors.New("component name must be unique"))
+		}
+		visitedComponents[component.Name] = true
+	}
+
+	return errs
+}
+
+func ValidateProjectComponent(c ProjectComponent) []error {
+	var errs []error
+	if c.Name == "" {
+		errs = append(errs, errors.New("a project component name must be defined"))
 	}
 	return errs
 }
 
-func ValidateProjectComponents(c ProjectComponents) []error {
+func ValidateCluster(c ProjectCluster) []error {
 	var errs []error
-	if len(c.Folders) == 0 {
-		errs = append(errs, errors.New("project components folders are required"))
+	if c.Name() == "" {
+		errs = append(errs, errors.New("kind cluster name is required"))
 	}
-	if c.FileName == "" {
-		errs = append(errs, errors.New("project components file name is required"))
+	switch c := c.(type) {
+	case *KindCluster:
+		errs = append(errs, ValidateKindCluster(c)...)
+	case *BasicCluster:
+		break
+	default:
+		errs = append(errs, errors.New("unsupported cluster type"))
 	}
 	return errs
 }
 
-func ValidateKindCluster(c KindCluster) []error {
+func ValidateKindCluster(c *KindCluster) []error {
 	var errs []error
-	if c.KindConfig == nil {
+	cfg := c.Config().(*KindConfig)
+	if cfg == nil {
 		errs = append(errs, errors.New("kind config is required"))
-	} else {
-		errs = append(errs, ValidateKindConfig(*c.KindConfig)...)
+		return errs
 	}
+	errs = append(errs, ValidateKindConfig(cfg)...)
 	return errs
 }
 
-func ValidateKindConfig(c KindConfig) []error {
+func ValidateKindConfig(c *KindConfig) []error {
 	var errs []error
 	if c.ConfigFile == "" {
 		errs = append(errs, errors.New("kind config file is required"))

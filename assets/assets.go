@@ -67,8 +67,13 @@ func GetFilesFromSubdirectory(subdir string) ([]string, error) {
 }
 
 // GetComponentFiles returns all files from the components directory
-func GetComponentFiles() ([]string, error) {
+func GetComponentsFiles() ([]string, error) {
 	return getFilesFromDir("components")
+}
+
+// GetComponentFiles returns all files from the components directory
+func GetComponentFiles(component string) ([]string, error) {
+	return getFilesFromDir(path.Join("components", component))
 }
 
 // GetOverrideFiles returns all files from the overrides directory

@@ -29,7 +29,15 @@ func (c *ComponentConverter) FromFile(config encoding.ConfigFile) (encoding.Conf
 		return nil, fmt.Errorf("no component configuration provided")
 	}
 	if config, ok := config.(*v1alpha1.Component); ok {
-		return ConvertV1Alpha1ToComponent(config)
+		cfg, err := ConvertV1Alpha1ToComponent(config)
+		if err != nil {
+			return nil, err
+		}
+		errs := c.Validate(cfg)
+		if len(errs) > 0 {
+			return cfg, fmt.Errorf("invalid component configuration")
+		}
+		return cfg, nil
 	}
 	return nil, fmt.Errorf("invalid component configuration")
 }
@@ -51,7 +59,7 @@ func (c *ComponentConverter) Validate(config encoding.ConfigObject) []error {
 		return []error{fmt.Errorf("no component configuration provided")}
 	}
 	if config, ok := config.(*component.Component); ok {
-		return component.ValidateComponent(*config)
+		return component.Validate(*config)
 	}
 	return []error{fmt.Errorf("invalid component configuration")}
 }

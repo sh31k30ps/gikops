@@ -19,7 +19,7 @@ func NewYAMLParser(manager ConfigManager) ConfigParser {
 	return &YAMLParser{
 		unmarshal:       yaml.Unmarshal,
 		unmarshalStrict: yamlUnmarshalStrict,
-		marshal:         yaml.Marshal,
+		marshal:         yamlMarshal,
 		manager:         manager,
 	}
 }
@@ -45,4 +45,14 @@ func yamlUnmarshalStrict(raw []byte, c ConfigFile) error {
 	d := yaml.NewDecoder(bytes.NewReader(raw))
 	d.KnownFields(true)
 	return d.Decode(c)
+}
+
+func yamlMarshal(config interface{}) ([]byte, error) {
+	out := bytes.NewBuffer(nil)
+	e := yaml.NewEncoder(out)
+	e.SetIndent(2)
+	if err := e.Encode(config); err != nil {
+		return nil, fmt.Errorf("error marshaling config: %w", err)
+	}
+	return out.Bytes(), nil
 }

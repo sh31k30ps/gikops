@@ -7,23 +7,26 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/sh31k30ps/gikopsctl/pkg"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
 	"github.com/sh31k30ps/gikopsctl/pkg/internal/dependencies"
 	"github.com/sh31k30ps/gikopsctl/pkg/internal/kubectl"
 	"github.com/sh31k30ps/gikopsctl/pkg/internal/kustomize"
+	"github.com/sh31k30ps/gikopsctl/pkg/services"
 )
 
-func (m *Manager) ApplyComponents(components []string, env string, mode ApplyMode) error {
+func (m *Manager) ApplyComponents(components []string, env string, mode ApplyMode, only bool) error {
 	m.logger.V(0).Info("Applying components")
-	m.status.Start("Checking dependencies")
-	dg := dependencies.NewDependencyGraph()
-	components, errs := dg.Resolve(components, pkg.GetComponent)
-	if len(errs) > 0 {
-		m.status.End(false)
-		return fmt.Errorf("dependencies check failed: %v", errs)
+	if !only {
+		m.status.Start("Checking dependencies")
+		dg := dependencies.NewDependencyGraph()
+		var errs []error
+		components, errs = dg.Resolve(components, services.GetComponent)
+		if len(errs) > 0 {
+			m.status.End(false)
+			return fmt.Errorf("dependencies check failed: %v", errs)
+		}
+		m.status.End(true)
 	}
-	m.status.End(true)
 
 	m.status.Start("Checking environment")
 	if err := checkEnvironment(env); err != nil {
@@ -77,7 +80,7 @@ func (m *Manager) ApplyComponent(componentName, env string) error {
 }
 
 func (m *Manager) applySingleCRDs(name string, env string) error {
-	cfg, err := pkg.GetComponent(name)
+	cfg, err := services.GetComponent(name)
 	if err != nil {
 		return fmt.Errorf("failed to get component: %w", err)
 	}
@@ -103,7 +106,7 @@ func (m *Manager) applySingleComponent(name, env string) error {
 		return fmt.Errorf("kustomize.yaml not found in %s/%s: %w", name, env, err)
 	}
 
-	cfg, err := pkg.GetComponent(name)
+	cfg, err := services.GetComponent(name)
 	if err != nil {
 		return fmt.Errorf("failed to get component: %w", err)
 	}
@@ -135,7 +138,7 @@ func (m *Manager) applySingleComponent(name, env string) error {
 	if cfg.Exec != nil && len(cfg.Exec.Before) > 0 {
 		for _, command := range cfg.Exec.Before {
 			m.logger.V(1).Info(fmt.Sprintf("Running before script: %s", command))
-			if err := exec.Command("sh", "-c", command).Run(); err != nil {
+			if err := m.logger.V(1).CmdOutput(exec.Command("sh", "-c", command)); err != nil {
 				return fmt.Errorf("failed to run before script: %w", err)
 			}
 		}
@@ -158,7 +161,7 @@ func (m *Manager) applySingleComponent(name, env string) error {
 	if cfg.Exec != nil && len(cfg.Exec.After) > 0 {
 		for _, command := range cfg.Exec.After {
 			m.logger.V(1).Info(fmt.Sprintf("Running after script: %s", command))
-			if err := exec.Command("sh", "-c", command).Run(); err != nil {
+			if err := m.logger.V(1).CmdOutput(exec.Command("sh", "-c", command)); err != nil {
 				return fmt.Errorf("failed to run after script: %w", err)
 			}
 		}

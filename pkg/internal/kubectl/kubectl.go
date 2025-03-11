@@ -5,18 +5,20 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/sh31k30ps/gikopsctl/pkg"
+	"github.com/sh31k30ps/gikopsctl/pkg/services"
 )
 
 func ChangeContext(context string) error {
-	if context == "local" {
-		cfg, err := pkg.GetCurrentProject()
-		if err != nil {
-			return fmt.Errorf("failed to get current project: %w", err)
-		}
-		context = "kind-" + cfg.GetLocalClusterName()
+	config, err := services.GetCurrentProject()
+	if err != nil {
+		return fmt.Errorf("failed to get current project: %w", err)
 	}
-	cmd := exec.Command("kubectl", "config", "use-context", context)
+
+	cluster := config.GetCluster(context)
+	if cluster == nil {
+		return fmt.Errorf("cluster %s not found", context)
+	}
+	cmd := exec.Command("kubectl", "config", "use-context", cluster.GetContext())
 	if _, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("failed to change context: %w", err)
 	}

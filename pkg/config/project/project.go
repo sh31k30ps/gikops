@@ -3,63 +3,25 @@ package project
 import "os"
 
 type Project struct {
-	Name         string
-	Components   *ProjectComponents
-	LocalCluster *KindCluster
-	Environments []string
+	Name       string
+	Components []ProjectComponent
+	Clusters   []ProjectCluster
 }
 
 func NewProject() *Project {
 	return &Project{
-		Components:   NewProjectComponents(),
-		LocalCluster: NewKindCluster(),
-		Environments: []string{},
+		Components: []ProjectComponent{},
+		Clusters:   []ProjectCluster{},
 	}
 }
 
-func (p *Project) GetLocalClusterName() string {
-	if p.LocalCluster == nil || p.LocalCluster.Name == "" {
-		return p.Name
+func (p *Project) GetCluster(name string) ProjectCluster {
+	for _, cluster := range p.Clusters {
+		if cluster.Name() == name {
+			return cluster
+		}
 	}
-	return p.LocalCluster.Name
-}
-
-type ProjectComponents struct {
-	Folders  []string
-	FileName string
-}
-
-func NewProjectComponents() *ProjectComponents {
-	return &ProjectComponents{
-		Folders:  []string{},
-		FileName: "",
-	}
-}
-
-type KindCluster struct {
-	Name       string
-	KindConfig *KindConfig
-}
-
-func NewKindCluster() *KindCluster {
-	return &KindCluster{
-		Name:       "",
-		KindConfig: NewKindConfig(),
-	}
-}
-
-type KindConfig struct {
-	ConfigFile      string
-	OverridesFolder []string
-	Provider        KindConfigProvider
-}
-
-func NewKindConfig() *KindConfig {
-	return &KindConfig{
-		OverridesFolder: []string{},
-		Provider:        "",
-		ConfigFile:      "",
-	}
+	return nil
 }
 
 func GetProjectFileName() string {

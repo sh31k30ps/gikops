@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/sh31k30ps/gikopsctl/pkg"
+	"github.com/sh31k30ps/gikopsctl/pkg/services"
 )
 
 func checkEnvironment(env string) error {
@@ -12,20 +12,22 @@ func checkEnvironment(env string) error {
 		return fmt.Errorf("environment is required")
 	}
 
-	pCfg, err := pkg.GetCurrentProject()
+	pCfg, err := services.GetCurrentProject()
 	if err != nil {
 		return fmt.Errorf("failed to get project: %w", err)
 	}
 
-	if len(pCfg.Environments) == 0 {
-		return fmt.Errorf("project %s does not have any environments", pCfg.Name)
+	if len(pCfg.Clusters) == 0 {
+		return fmt.Errorf("project %s does not have any clusters", pCfg.Name)
 	}
 
-	if !slices.Contains(pCfg.Environments, env) {
-		return fmt.Errorf("environment %s is not available for project %s", env, pCfg.Name)
+	for _, cluster := range pCfg.Clusters {
+		if cluster.Name() == env {
+			return nil
+		}
 	}
 
-	return nil
+	return fmt.Errorf("environment %s is not available for project %s", env, pCfg.Name)
 }
 
 func checkComponentEnvironment(component, env string) error {
@@ -33,7 +35,7 @@ func checkComponentEnvironment(component, env string) error {
 		return fmt.Errorf("failed to check environment: %w", err)
 	}
 
-	cfg, err := pkg.GetComponent(component)
+	cfg, err := services.GetComponent(component)
 	if err != nil {
 		return fmt.Errorf("failed to get component: %w", err)
 	}
