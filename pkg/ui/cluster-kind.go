@@ -7,15 +7,23 @@ import (
 	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
 )
 
-func (ui *UIProject) requestKindCluster() (*project.KindCluster, error) {
+func (ui *UIProject) RequestKindCluster() (*project.KindCluster, error) {
+	cName, cNameErr := ui.selectName("", "cluster")
+	if cNameErr != nil {
+		return nil, fmt.Errorf("cluster name is required")
+	}
+	if cName == "" {
+		return nil, fmt.Errorf("cluster name is required")
+	}
 	provider, err := ui.selectKindProvider()
 	if err != nil {
 		return nil, err
 	}
 	cluster := &project.KindCluster{}
-	cluster.SetConfig(project.KindConfig{
+	cluster.SetConfig(&project.KindConfig{
 		Provider: provider,
 	})
+	cluster.SetName(cName)
 	return cluster, nil
 }
 

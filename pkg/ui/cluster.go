@@ -29,32 +29,24 @@ func (ui *UIProject) requestCluster() (project.ProjectCluster, error) {
 	if err != nil {
 		return nil, err
 	}
-	cName, cNameErr := ui.selectName("", "cluster")
-	if cNameErr != nil {
-		return nil, fmt.Errorf("cluster name is required")
-	}
-	if cName == "" {
-		return nil, fmt.Errorf("cluster name is required")
-	}
 	var (
 		cluster project.ProjectCluster
 		cErr    error
 	)
 	switch clusterType {
 	case project.ClusterTypeKind:
-		cluster, cErr = ui.requestKindCluster()
+		cluster, cErr = ui.RequestKindCluster()
 		if cErr != nil {
 			return nil, cErr
 		}
 	case project.ClusterTypeBasic:
-		cluster, cErr = ui.requestBasicCluster()
+		cluster, cErr = ui.RequestBasicCluster()
 		if cErr != nil {
 			return nil, cErr
 		}
 	default:
 		return nil, fmt.Errorf("invalid cluster type: %s", clusterType)
 	}
-	cluster.SetName(cName)
 	return cluster, nil
 }
 

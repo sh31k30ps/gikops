@@ -11,5 +11,7 @@ func NewCommand(logger log.Logger) *cobra.Command {
 		Short: "Add parameters to the project",
 	}
 
+	cmd.AddCommand(newClusterCmd(logger))
+
 	return cmd
 }
