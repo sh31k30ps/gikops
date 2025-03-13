@@ -19,35 +19,41 @@ func NewCommand(logger log.Logger) *cobra.Command {
 		Use:   "check",
 		Short: "Check the required tools",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			tools := tools.GetTools()
-			logger.V(0).Info("Dependencies:")
-			for _, tool := range tools {
+			infos := tools.ListTools()
+			logger.V(0).Info("Tools:")
+			for _, tool := range infos {
 				status := success
 				message := "up to date"
 
 				if !tool.IsInstalled {
 					message = "not installed"
 					status = warning
+
 					if tool.IsMandatory {
 						status = failure
 					}
+
 					logger.V(0).Info(fmt.Sprintf("  %s %s: %s", status, tool.Name, message))
 					continue
 				}
 
 				if !tool.IsUpToDate {
 					status = warning
+
 					if tool.IsMandatory {
 						status = failure
 					}
+
 					message = "not up to date"
 				}
 
 				logger.V(0).Info(fmt.Sprintf("  %s %s: %s", status, tool.Name, message))
-
+				if tool.UseAlternative {
+					logger.V(0).Info(fmt.Sprintf("    	Alternative: %s", tool.ResolvedName))
+				}
 				if tool.IsInstalled {
 					logger.V(0).Info(fmt.Sprintf("    	Minimal version: %s", tool.MinVersion))
-					logger.V(0).Info(fmt.Sprintf("    	Current version: %s", tool.CurrentVersion))
+					logger.V(0).Info(fmt.Sprintf("    	Current version: %s", tool.Version))
 				}
 			}
 			return nil

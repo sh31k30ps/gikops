@@ -6,7 +6,16 @@ import (
 	"strings"
 
 	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikopsctl/pkg/tools"
 )
+
+func getCmdArgs() (string, []string, error) {
+	tool, err := tools.GetToolResolver().GetTool("kubectl")
+	if err != nil {
+		return "", nil, fmt.Errorf("kubectl is not installed or accessible: %w", err)
+	}
+	return tool.ResolvedName, tool.GetCmdArgs(), nil
+}
 
 func ChangeContext(context string) error {
 	config, err := services.GetCurrentProject()
@@ -18,7 +27,12 @@ func ChangeContext(context string) error {
 	if cluster == nil {
 		return fmt.Errorf("cluster %s not found", context)
 	}
-	cmd := exec.Command("kubectl", "config", "use-context", cluster.GetContext())
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kubectl command: %w", err)
+	}
+
+	cmd := exec.Command(c, append(args, "config", "use-context", cluster.GetContext())...)
 	if _, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("failed to change context: %w", err)
 	}
@@ -26,7 +40,12 @@ func ChangeContext(context string) error {
 }
 
 func ChangeNamespace(namespace string) error {
-	cmd := exec.Command("kubectl", "config", "set-context", "--current", "--namespace", namespace)
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kubectl command: %w", err)
+	}
+
+	cmd := exec.Command(c, append(args, "config", "set-context", "--current", "--namespace", namespace)...)
 	if _, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("failed to change namespace: %w", err)
 	}
@@ -34,7 +53,12 @@ func ChangeNamespace(namespace string) error {
 }
 
 func CreateNamespace(namespace string) error {
-	cmd := exec.Command("kubectl", "create", "namespace", namespace)
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kubectl command: %w", err)
+	}
+
+	cmd := exec.Command(c, append(args, "create", "namespace", namespace)...)
 	if _, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("failed to create namespace: %w", err)
 	}
@@ -42,7 +66,12 @@ func CreateNamespace(namespace string) error {
 }
 
 func NamespaceExists(namespace string) (bool, error) {
-	cmd := exec.Command("kubectl", "get", "namespace", namespace)
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return false, fmt.Errorf("failed to get kubectl command: %w", err)
+	}
+
+	cmd := exec.Command(c, append(args, "get", "namespace", namespace)...)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		if strings.Contains(string(output), "not found") {
 			return false, nil
@@ -53,7 +82,12 @@ func NamespaceExists(namespace string) (bool, error) {
 }
 
 func CreateCRDs(crds string) error {
-	cmd := exec.Command("kubectl", "create", "-f", crds)
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kubectl command: %w", err)
+	}
+
+	cmd := exec.Command(c, append(args, "create", "-f", crds)...)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		if strings.Contains(string(output), "already exists") {
 			return nil
@@ -64,7 +98,12 @@ func CreateCRDs(crds string) error {
 }
 
 func Apply(file string) error {
-	cmd := exec.Command("kubectl", "apply", "-f", file)
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kubectl command: %w", err)
+	}
+
+	cmd := exec.Command(c, append(args, "apply", "-f", file)...)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		lines := strings.Split(string(output), "\n")
 		return fmt.Errorf("failed to apply: %s : %w", &lines, err)
@@ -73,9 +112,14 @@ func Apply(file string) error {
 }
 
 func WaittingForResourcesBeReady(resources []string) error {
-	args := []string{"rollout", "status", "--timeout=2m"}
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kubectl command: %w", err)
+	}
+
+	args = append(args, "rollout", "status", "--timeout=2m")
 	args = append(args, resources...)
-	cmd := exec.Command("kubectl", args...)
+	cmd := exec.Command(c, args...)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("failed to wait for resource to be ready: %s: %w", string(output), err)
 	}
