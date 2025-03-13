@@ -28,7 +28,11 @@ func CmdWithAddCluster(cmd *cobra.Command, logger log.Logger) *cobra.Command {
 			}
 			return icmd.CreateSpecific(cfgcluster.ClusterType(args[0]))
 		}
-		return icmd.Create()
+		if err := icmd.Create(); err != nil {
+			return err
+		}
+		logger.V(0).Info("Cluster created successfully")
+		return nil
 	}
 	cmd.ValidArgsFunction = func(
 		cmd *cobra.Command,

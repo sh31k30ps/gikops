@@ -24,7 +24,11 @@ func CmdWithDeleteCluster(cmd *cobra.Command, logger log.Logger) *cobra.Command 
 			return err
 		}
 		if icmd, ok := icmd.(*cluster.Command); ok {
-			return icmd.Delete(args[0])
+			if err := icmd.Delete(args[0]); err != nil {
+				return err
+			}
+			logger.V(0).Info(fmt.Sprintf("Cluster %s deleted successfully", args[0]))
+			return nil
 		}
 		return fmt.Errorf("invalid command")
 	}
