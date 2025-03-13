@@ -1,4 +1,4 @@
-package add
+package delete
 
 import (
 	"github.com/sh31k30ps/gikopsctl/pkg/log"
@@ -7,8 +7,8 @@ import (
 
 func NewCommand(logger log.Logger) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "add",
-		Short: "Add parameters to the project",
+		Use:   "delete",
+		Short: "Delete parameters from the project",
 	}
 
 	cmd.AddCommand(newClusterCommand(logger))

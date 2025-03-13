@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sh31k30ps/gikopsctl/api/config/v1alpha1"
+	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/internal/encoding"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
 )
@@ -70,7 +71,7 @@ func ConvertV1Alpha1ToProject(cfg *v1alpha1.Project) (*project.Project, error) {
 	}
 	cfg = cfg.DeepCopy()
 
-	p := project.NewProject()
+	p := project.NewConfig()
 	p.Name = cfg.Metadata.Name
 
 	if len(cfg.Components) > 0 {
@@ -81,14 +82,14 @@ func ConvertV1Alpha1ToProject(cfg *v1alpha1.Project) (*project.Project, error) {
 	}
 
 	if len(cfg.Clusters) > 0 {
-		p.Clusters = make([]project.ProjectCluster, len(cfg.Clusters))
-		for i, cluster := range cfg.Clusters {
-			if cluster.KindConfig != nil {
-				p.Clusters[i] = project.NewKindCluster()
-				ConvertV1Alpha1ToKindCluster(&cluster, p.Clusters[i].(*project.KindCluster))
+		p.Clusters = make([]cluster.Cluster, len(cfg.Clusters))
+		for i, c := range cfg.Clusters {
+			if c.KindConfig != nil {
+				p.Clusters[i] = cluster.NewKindCluster()
+				ConvertV1Alpha1ToKindCluster(&c, p.Clusters[i].(*cluster.KindCluster))
 			} else {
-				p.Clusters[i] = project.NewBasicCluster()
-				p.Clusters[i].(*project.BasicCluster).SetName(cluster.Name)
+				p.Clusters[i] = cluster.NewBasicCluster()
+				p.Clusters[i].(*cluster.BasicCluster).SetName(c.Name)
 			}
 		}
 	}
@@ -101,19 +102,19 @@ func ConvertV1Alpha1ToProjectComponent(in *v1alpha1.ProjectComponent, out *proje
 	out.Require = in.Require
 }
 
-func ConvertV1Alpha1ToKindCluster(in *v1alpha1.Cluster, out *project.KindCluster) {
+func ConvertV1Alpha1ToKindCluster(in *v1alpha1.Cluster, out *cluster.KindCluster) {
 	out.SetName(in.Name)
 	if in.KindConfig != nil {
-		cfg := project.NewKindConfig()
+		cfg := cluster.NewKindConfig()
 		ConvertV1Alpha1ToKindConfig(in.KindConfig, cfg)
 		out.SetConfig(cfg)
 	}
 }
 
-func ConvertV1Alpha1ToKindConfig(in *v1alpha1.ClusterKindConfig, out *project.KindConfig) {
+func ConvertV1Alpha1ToKindConfig(in *v1alpha1.ClusterKindConfig, out *cluster.KindConfig) {
 	out.ConfigFile = in.ConfigFile
 	out.OverridesFolder = in.OverridesFolder
-	out.Provider = project.KindConfigProvider(in.Provider)
+	out.Provider = cluster.KindConfigProvider(in.Provider)
 }
 
 func ConvertProjectToV1Alpha1(cfg *project.Project) (*v1alpha1.Project, error) {
@@ -149,28 +150,28 @@ func ConvertProjectComponentToV1Alpha1(in project.ProjectComponent, out *v1alpha
 	out.Require = in.Require
 }
 
-func ConvertClusterToV1Alpha1(in project.ProjectCluster, out *v1alpha1.Cluster) {
+func ConvertClusterToV1Alpha1(in cluster.Cluster, out *v1alpha1.Cluster) {
 	switch c := in.(type) {
-	case *project.KindCluster:
+	case *cluster.KindCluster:
 		ConvertKindClusterToV1Alpha1(c, out)
-	case *project.BasicCluster:
+	case *cluster.BasicCluster:
 		out.Name = c.Name()
 	default:
 	}
 }
 
-func ConvertKindClusterToV1Alpha1(in *project.KindCluster, out *v1alpha1.Cluster) {
+func ConvertKindClusterToV1Alpha1(in *cluster.KindCluster, out *v1alpha1.Cluster) {
 	if in == nil {
 		return
 	}
 	out.Name = in.Name()
 	if in.Config() != nil {
 		out.KindConfig = &v1alpha1.ClusterKindConfig{}
-		ConvertKindConfigToV1Alpha1(in.Config().(*project.KindConfig), out.KindConfig)
+		ConvertKindConfigToV1Alpha1(in.Config().(*cluster.KindConfig), out.KindConfig)
 	}
 }
 
-func ConvertKindConfigToV1Alpha1(in *project.KindConfig, out *v1alpha1.ClusterKindConfig) {
+func ConvertKindConfigToV1Alpha1(in *cluster.KindConfig, out *v1alpha1.ClusterKindConfig) {
 	out.ConfigFile = in.ConfigFile
 	out.OverridesFolder = in.OverridesFolder
 	out.Provider = string(in.Provider)

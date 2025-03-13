@@ -7,6 +7,8 @@ import (
 
 type ConfigExtension string
 type ConfigType string
+type ConfigFile any
+type ConfigObject any
 
 const (
 	ConfigExtensionJSON ConfigExtension = "json"

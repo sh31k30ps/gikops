@@ -47,6 +47,11 @@ func getProjectFile(fileName string, depth int) (*project.Project, error) {
 	return currentProject.(*project.Project), nil
 }
 
+func ReloadCurrentProject() (*project.Project, error) {
+	currentProject = nil
+	return GetCurrentProject()
+}
+
 func SetConfigFile(fileName string) {
 	configFile = fileName
 }

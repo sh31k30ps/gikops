@@ -15,6 +15,8 @@ func NewCommand(logger log.Logger) *cobra.Command {
 	cmd.AddCommand(
 		newInstallCommand(logger),
 		newUninstallCommand(logger),
+		newAddCommand(logger),
+		newDeleteCommand(logger),
 	)
 
 	cmd.PersistentFlags().StringP("config", "c", "", "Path to the project configuration file")
