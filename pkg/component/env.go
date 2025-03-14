@@ -40,11 +40,11 @@ func checkComponentEnvironment(component, env string) error {
 		return fmt.Errorf("failed to get component: %w", err)
 	}
 
-	if len(cfg.EnvironmentAvailability) == 0 {
+	if len(cfg.Clusters) == 0 {
 		return nil
 	}
 
-	if !slices.Contains(cfg.EnvironmentAvailability, env) {
+	if !slices.Contains(cfg.Clusters, env) {
 		return fmt.Errorf("environment %s is not available for component %s", env, component)
 	}
 	return nil

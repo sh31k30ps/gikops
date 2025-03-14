@@ -1,7 +1,16 @@
 package component
 
-import "github.com/sh31k30ps/gikopsctl/pkg/config/project"
+import (
+	"github.com/sh31k30ps/gikopsctl/pkg/ui/helm"
+	"github.com/sh31k30ps/gikopsctl/pkg/ui/kustomize"
+)
 
 type UIComponentResults struct {
-	Components []project.ProjectComponent
+	Name      string
+	Namespace string
+	Disabled  bool
+	DependsOn []string
+	Helm      *helm.UIHelmResults
+	Kustomize *kustomize.UIKustomizeResults
+	Clusters  []string
 }

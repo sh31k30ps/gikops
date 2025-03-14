@@ -3,6 +3,7 @@ package encoding
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/sh31k30ps/gikopsctl/pkg/config"
 )
@@ -81,6 +82,15 @@ func (cm *DefaultConfigManager) Save(path string, cfg ConfigObject, version, kin
 		return fmt.Errorf("error generating project file content: %w", err)
 	}
 
+	_, err = os.Stat(filepath.Dir(path))
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return fmt.Errorf("error checking file existence: %w", err)
+		}
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			return fmt.Errorf("error creating directory: %w", err)
+		}
+	}
 	return os.WriteFile(path, content, 0644)
 }
 

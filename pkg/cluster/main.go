@@ -6,9 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/sh31k30ps/gikopsctl/pkg/cli"
+	"github.com/sh31k30ps/gikopsctl/pkg/component"
 	cfgcluster "github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/manager"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
+	"github.com/sh31k30ps/gikopsctl/pkg/directories"
 	"github.com/sh31k30ps/gikopsctl/pkg/log"
 	"github.com/sh31k30ps/gikopsctl/pkg/services"
 	uicluster "github.com/sh31k30ps/gikopsctl/pkg/ui/cluster"
@@ -28,7 +30,7 @@ func NewCommand(logger log.Logger) *Command {
 	}
 }
 
-func (c *Command) Create() error {
+func (c *Command) Create(args ...interface{}) error {
 	if _, err := c.ui.Request(); err != nil {
 		return err
 	}
@@ -44,8 +46,7 @@ func (c *Command) Create() error {
 		return err
 	}
 	c.logger.V(1).Info("Project file saved")
-	if err := c.GenerateClusters(); err != nil {
-
+	if err := c.Install(); err != nil {
 		return err
 	}
 	return nil
@@ -88,9 +89,14 @@ func (c *Command) Delete(id interface{}) error {
 		if err != nil {
 			return err
 		}
+
+		sCl := cfg.GetCluster(id)
+		if sCl == nil {
+			return fmt.Errorf("cluster %s not found", id)
+		}
 		cls := []cfgcluster.Cluster{}
 		for _, cl := range cfg.Clusters {
-			if cl.Name() != id {
+			if cl.Name() != sCl.Name() {
 				cls = append(cls, cl)
 			}
 		}
@@ -103,6 +109,9 @@ func (c *Command) Delete(id interface{}) error {
 		if err := os.RemoveAll(filepath.Join("clusters", id)); err != nil {
 			return err
 		}
+		if err := c.CleanComponentsCluster(sCl); err != nil {
+			return err
+		}
 		c.logger.V(1).Info("Cluster directory deleted")
 		return nil
 	}
@@ -113,7 +122,7 @@ func (c *Command) Add() error {
 	return nil
 }
 
-func (c *Command) GenerateClusters() error {
+func (c *Command) Install() error {
 	cfg, err := services.GetCurrentProject()
 	if err != nil {
 		return err
@@ -134,6 +143,40 @@ func (c *Command) GenerateCluster(cluster cfgcluster.Cluster) error {
 	creator := GetCreatorFromConfig(cluster, c.logger)
 	if err := creator.Create(cluster); err != nil {
 		return err
+	}
+	project, err := services.GetCurrentProject()
+	if err != nil {
+		return err
+	}
+	components := directories.GetRootsComponents(project)
+	mngr := component.NewManager(c.logger)
+	for _, cmpt := range components {
+		if err := mngr.AddCluster(cmpt, cluster); err != nil {
+			if !component.IsErrorClusterFolderExists(err) && !component.IsErrorLocalFolder(err) {
+				return err
+			}
+			continue
+		}
+		c.logger.V(1).Info(fmt.Sprintf("Cluster %s added to %s", cluster.Name(), cmpt))
+	}
+	return nil
+}
+
+func (c *Command) CleanComponentsCluster(cluster cfgcluster.Cluster) error {
+	project, err := services.GetCurrentProject()
+	if err != nil {
+		return err
+	}
+	components := directories.GetRootsComponents(project)
+	mngr := component.NewManager(c.logger)
+	for _, cmpt := range components {
+		if err := mngr.DeleteCluster(cmpt, cluster); err != nil {
+			if !component.IsErrorClusterFolderNotFound(err) {
+				return err
+			}
+			continue
+		}
+		c.logger.V(1).Info(fmt.Sprintf("Cluster %s removed from %s", cluster.Name(), cmpt))
 	}
 	return nil
 }

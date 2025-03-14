@@ -8,14 +8,11 @@ func SetComponentDefaults(c *Component) {
 		APIVersion: Version,
 		Kind:       ComponentKind,
 	}
-	if len(c.EnvironmentAvailability) == 0 {
-		c.EnvironmentAvailability = []string{"local"}
-	}
 	if c.Helm != nil {
 		SetHelmConfigDefaults(c.Helm)
 	}
-	if c.Exec != nil {
-		SetComponentExecDefaults(c.Exec)
+	if c.Kustomize != nil {
+		SetKustomizeConfigDefaults(c.Kustomize)
 	}
 	if c.Files == nil {
 		c.Files = &ComponentFiles{}
@@ -32,11 +29,17 @@ func SetHelmConfigDefaults(h *HelmConfig) {
 	}
 }
 
-func SetComponentExecDefaults(e *ComponentExec) {
-}
-
 func SetComponentFilesDefaults(f *ComponentFiles) {
 	if f.CRDs == "" {
 		f.CRDs = "crds.yaml"
+	}
+}
+
+func SetKustomizeConfigDefaults(k *KustomizeConfig) {
+	if k == nil {
+		return
+	}
+	if k.URLs == nil {
+		k.URLs = []string{}
 	}
 }

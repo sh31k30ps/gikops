@@ -39,8 +39,10 @@ func (pg *PodsGenerators) GetStatefulsets() []string {
 }
 
 func getPodsGeneratorsFromFile(file string) (*PodsGenerators, error) {
-	// Read the computed manifest file
-	manifestBytes, err := os.ReadFile("computed.yaml")
+	if file == "" {
+		file = "computed.yaml"
+	}
+	manifestBytes, err := os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read computed manifest: %w", err)
 	}

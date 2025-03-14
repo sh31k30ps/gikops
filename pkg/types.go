@@ -43,10 +43,11 @@ var (
 )
 
 type Command interface {
-	Create() error
+	Create(args ...interface{}) error
 	Edit() error
 	Delete(id interface{}) error
 	Add() error
+	Install() error
 }
 
 func GetCommand(Cmd CommandType, logger log.Logger) (Command, error) {

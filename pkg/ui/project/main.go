@@ -10,8 +10,8 @@ import (
 	"github.com/sh31k30ps/gikopsctl/pkg/services"
 	"github.com/sh31k30ps/gikopsctl/pkg/ui"
 	uicluster "github.com/sh31k30ps/gikopsctl/pkg/ui/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/internal/standard"
+	component "github.com/sh31k30ps/gikopsctl/pkg/ui/projectcomponent"
+	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
 )
 
 const (
@@ -44,7 +44,7 @@ func (ui *UIProjectRequester) Config() config.ConfigObject {
 	return cfg
 }
 
-func (ui *UIProjectRequester) Request() (ui.UIRequestResult, error) {
+func (ui *UIProjectRequester) Request(args ...interface{}) (ui.UIRequestResult, error) {
 	if err := ui.promptProjectName(); err != nil {
 		return nil, err
 	}

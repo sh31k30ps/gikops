@@ -85,12 +85,16 @@ func ConvertV1Alpha1ToComponent(cfg *v1alpha1.Component) (*component.Component, 
 		c.Helm = &component.HelmConfig{}
 		ConvertV1Alpha1ToHelmConfig(cfg.Helm, c.Helm)
 	}
+	if cfg.Kustomize != nil {
+		c.Kustomize = &component.KustomizeConfig{}
+		ConvertV1Alpha1ToKustomizeConfig(cfg.Kustomize, c.Kustomize)
+	}
 	if cfg.Files != nil {
-		c.Files = &component.ComponentFiles{}
+		c.Files = &component.FilesConfig{}
 		ConvertV1Alpha1ToComponentFiles(cfg.Files, c.Files)
 	}
 	if cfg.Exec != nil {
-		c.Exec = &component.ComponentExec{}
+		c.Exec = &component.ExecConfig{}
 		ConvertV1Alpha1ToComponentExec(cfg.Exec, c.Exec)
 	}
 
@@ -119,6 +123,12 @@ func ConvertV1Alpha1ToHelmConfig(in *v1alpha1.HelmConfig, out *component.HelmCon
 	if in.After != nil {
 		out.After = &component.HelmInitHooks{}
 		ConvertV1Alpha1ToComponentHelmInitHooks(in.After, out.After)
+	}
+}
+
+func ConvertV1Alpha1ToKustomizeConfig(in *v1alpha1.KustomizeConfig, out *component.KustomizeConfig) {
+	if len(in.URLs) > 0 {
+		out.URLs = in.URLs
 	}
 }
 
@@ -176,13 +186,13 @@ func ConvertV1Alpha1ToComponentHelmInitHooksConcats(in []v1alpha1.Concat) []comp
 	return out
 }
 
-func ConvertV1Alpha1ToComponentFiles(in *v1alpha1.ComponentFiles, out *component.ComponentFiles) {
+func ConvertV1Alpha1ToComponentFiles(in *v1alpha1.ComponentFiles, out *component.FilesConfig) {
 	out.CRDs = in.CRDs
 	out.Keep = in.Keep
 	out.SkipCRDs = in.SkipCRDs
 }
 
-func ConvertV1Alpha1ToComponentExec(in *v1alpha1.ComponentExec, out *component.ComponentExec) {
+func ConvertV1Alpha1ToComponentExec(in *v1alpha1.ComponentExec, out *component.ExecConfig) {
 	out.Before = in.Before
 	out.After = in.After
 }
@@ -191,6 +201,7 @@ func ConvertComponentToV1Alpha1(cfg *component.Component) (*v1alpha1.Component, 
 	if cfg == nil {
 		return nil, fmt.Errorf("no component configuration provided")
 	}
+	component.SetComponentDefaults(cfg)
 	c := &v1alpha1.Component{
 		Metadata: &v1alpha1.ComponentMetadata{
 			Name:      cfg.Name,
@@ -203,6 +214,10 @@ func ConvertComponentToV1Alpha1(cfg *component.Component) (*v1alpha1.Component, 
 		c.Helm = &v1alpha1.HelmConfig{}
 		ConvertHelmConfigToV1Alpha1(cfg.Helm, c.Helm)
 	}
+	if cfg.Kustomize != nil {
+		c.Kustomize = &v1alpha1.KustomizeConfig{}
+		ConvertKustomizeConfigToV1Alpha1(cfg.Kustomize, c.Kustomize)
+	}
 	if cfg.Files != nil {
 		c.Files = &v1alpha1.ComponentFiles{}
 		ConvertComponentFilesToV1Alpha1(cfg.Files, c.Files)
@@ -214,6 +229,7 @@ func ConvertComponentToV1Alpha1(cfg *component.Component) (*v1alpha1.Component, 
 	if len(cfg.DependsOn) > 0 {
 		c.DependsOn = cfg.DependsOn
 	}
+	v1alpha1.SetComponentDefaults(c)
 	return c, nil
 }
 
@@ -261,6 +277,12 @@ func ConvertComponentHelmInitHooksToV1Alpha1(in *component.HelmInitHooks, out in
 
 }
 
+func ConvertKustomizeConfigToV1Alpha1(in *component.KustomizeConfig, out *v1alpha1.KustomizeConfig) {
+	if len(in.URLs) > 0 {
+		out.URLs = in.URLs
+	}
+}
+
 func ConvertComponentHookUploadsToV1Alpha1(in []component.HelmHookUpload, out []v1alpha1.Upload) {
 	for _, u := range in {
 		out = append(out, v1alpha1.Upload{
@@ -289,13 +311,13 @@ func ConvertComponentHookConcatsToV1Alpha1(in []component.HelmHookConcat, out []
 	}
 }
 
-func ConvertComponentFilesToV1Alpha1(in *component.ComponentFiles, out *v1alpha1.ComponentFiles) {
+func ConvertComponentFilesToV1Alpha1(in *component.FilesConfig, out *v1alpha1.ComponentFiles) {
 	out.CRDs = in.CRDs
 	out.Keep = in.Keep
 	out.SkipCRDs = in.SkipCRDs
 }
 
-func ConvertComponentExecToV1Alpha1(in *component.ComponentExec, out *v1alpha1.ComponentExec) {
+func ConvertComponentExecToV1Alpha1(in *component.ExecConfig, out *v1alpha1.ComponentExec) {
 	out.Before = in.Before
 	out.After = in.After
 }

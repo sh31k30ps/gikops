@@ -1,4 +1,4 @@
-package component
+package helm
 
 import (
 	"fmt"
@@ -278,7 +278,7 @@ func processCutTemplate(file string) error {
 
 // getUniqueFilePath retourne un chemin de fichier unique en ajoutant un suffixe numérique si nécessaire
 func getUniqueFilePath(basePath string) string {
-	if !fileExists(basePath) {
+	if _, err := os.Stat(basePath); os.IsNotExist(err) {
 		return basePath
 	}
 
@@ -288,7 +288,7 @@ func getUniqueFilePath(basePath string) string {
 	counter := 1
 	for {
 		newPath := fmt.Sprintf("%s_%d%s", baseWithoutExt, counter, ext)
-		if !fileExists(newPath) {
+		if _, err := os.Stat(newPath); os.IsNotExist(err) {
 			return newPath
 		}
 		counter++
@@ -328,10 +328,4 @@ func cleanBaseDir(cfg *component.Component) error {
 		}
 	}
 	return nil
-}
-
-// fileExists vérifie si un fichier existe
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
 }

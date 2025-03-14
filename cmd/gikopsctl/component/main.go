@@ -27,6 +27,7 @@ func NewCommand(logger log.Logger) *cobra.Command {
 		newInitCmd(logger),
 		newApplyCmd(logger),
 		newCheckCmd(logger),
+		newCreateCmd(logger),
 	)
 
 	return cmd

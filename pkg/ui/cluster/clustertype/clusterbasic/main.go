@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/internal/standard"
+	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
 )
 
 type Requester struct {

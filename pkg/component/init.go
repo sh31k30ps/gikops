@@ -41,10 +41,6 @@ func (m *Manager) InitComponent(componentName string) error {
 }
 
 func (m *Manager) initSingleComponent(name string) error {
-	cCfg, err := services.GetComponent(name)
-	if err != nil {
-		return fmt.Errorf("failed to get component: %w", err)
-	}
 	currentDir, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("failed to get current directory: %w", err)
@@ -53,20 +49,10 @@ func (m *Manager) initSingleComponent(name string) error {
 	if err := os.Chdir(name); err != nil {
 		return fmt.Errorf("failed to change to component directory %s: %w", name, err)
 	}
-
-	if cCfg.Helm != nil {
-		if err := processHookInit(cCfg.Helm.Before); err != nil {
-			return fmt.Errorf("failed to process before hooks: %w", err)
-		}
-
-		if err := setupHelmRepo(name, cCfg); err != nil {
-			return err
-		}
-
-		if err := processHookInit(cCfg.Helm.After); err != nil {
-			return fmt.Errorf("failed to process after hooks: %w", err)
+	for _, initializer := range m.initializer {
+		if err := initializer.Init(name); err != nil {
+			return fmt.Errorf("failed to initialize component %s: %w", name, err)
 		}
 	}
-
 	return nil
 }

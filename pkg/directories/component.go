@@ -11,8 +11,8 @@ import (
 )
 
 func GetComponentConfigFile(projectConfig *project.Project, name string) (string, error) {
-	yamlCfg := filepath.Join(name, manager.GetComponentFileName(projectConfig)+"."+string(config.ConfigExtensionYAML))
-	jsonCfg := filepath.Join(name, manager.GetComponentFileName(projectConfig)+"."+string(config.ConfigExtensionJSON))
+	yamlCfg := filepath.Join(name, manager.GetComponentFileName()+"."+string(config.ConfigExtensionYAML))
+	jsonCfg := filepath.Join(name, manager.GetComponentFileName()+"."+string(config.ConfigExtensionJSON))
 	if _, err := os.Stat(yamlCfg); err == nil {
 		return yamlCfg, nil
 	}

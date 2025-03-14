@@ -1,10 +1,5 @@
 package component
 
-import (
-	"github.com/sh31k30ps/gikopsctl/pkg/cli"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-)
-
 type ApplyMode string
 
 const (
@@ -70,14 +65,10 @@ func (t ComponentType) IsValid() bool {
 	return false
 }
 
-type Manager struct {
-	logger log.Logger
-	status *cli.Status
+type Initializer interface {
+	Init(name string) error
 }
 
-func NewManager(logger log.Logger) *Manager {
-	return &Manager{
-		logger: logger,
-		status: cli.StatusForLogger(logger),
-	}
+type Applier interface {
+	Apply() error
 }

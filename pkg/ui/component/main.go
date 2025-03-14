@@ -1,99 +1,105 @@
 package component
 
 import (
-	"fmt"
-	"path/filepath"
-
-	"github.com/sh31k30ps/gikopsctl/assets"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
+	"github.com/sh31k30ps/gikopsctl/pkg/cli"
+	"github.com/sh31k30ps/gikopsctl/pkg/config"
+	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
+	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikopsctl/pkg/services"
 	"github.com/sh31k30ps/gikopsctl/pkg/ui"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/internal/standard"
+	"github.com/sh31k30ps/gikopsctl/pkg/ui/helm"
+	"github.com/sh31k30ps/gikopsctl/pkg/ui/kustomize"
+	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
 )
 
 const (
-	questionAddComponentsFolders = "Do you want to add components folders?"
-	questionAddMoreComponents    = "Do you want to add more components folders?"
+	questionAddKustomize = "Do you want to use kustomize?"
+	questionAddHelm      = "Do you want to use helm?"
 )
 
 type UIComponentRequester struct {
 	results *UIComponentResults
+	logger  log.Logger
+	status  *cli.Status
 }
 
-func NewRequester() *UIComponentRequester {
+func NewRequester(logger log.Logger) *UIComponentRequester {
 	return &UIComponentRequester{
-		results: &UIComponentResults{
-			Components: []project.ProjectComponent{},
-		},
+		logger:  logger,
+		status:  cli.StatusForLogger(logger),
+		results: &UIComponentResults{},
 	}
 }
-func (ui *UIComponentRequester) Request() (ui.UIRequestResult, error) {
-	core, err := ui.promptCoreComponents()
+
+func (ui *UIComponentRequester) Request(componentName string) (ui.UIRequestResult, error) {
+	ui.results.Name = componentName
+	if componentName == "" {
+		res, err := standard.PromptName("", "component")
+		if err != nil {
+			return nil, err
+		}
+		ui.results.Name = res
+	}
+
+	res, err := standard.Prompt("", "Specific namespace of the component")
 	if err != nil {
 		return nil, err
 	}
-	ui.results.Components = append(ui.results.Components, *core)
-	if reps, err := standard.PromptYesNo(questionAddComponentsFolders); err != nil || !reps {
-		return ui.results.Components, nil
+	if res != "" {
+		ui.results.Namespace = res
 	}
-	if err := ui.requestComponentsFolders(); err != nil {
-		return nil, err
-	}
-	return ui.results.Components, nil
-}
 
-func (ui *UIComponentRequester) promptCoreComponents() (*project.ProjectComponent, error) {
-	core := &project.ProjectComponent{
-		Name:    "core",
-		Require: []string{},
-	}
-	componentsDirs, compDirErr := assets.GetSubdirectories("components")
-	if compDirErr != nil {
-		return nil, fmt.Errorf("error getting components: %w", compDirErr)
-	}
-	for _, compDir := range componentsDirs {
-		components, compErr := assets.GetSubdirectories(compDir)
-		if compErr != nil {
-			return nil, fmt.Errorf("error getting %s components: %w", compDir, compErr)
-		}
-		// Clean component paths to get only the last part
-		cleanComponents := make([]string, len(components))
-		for i, comp := range components {
-			cleanComponents[i] = filepath.Base(comp)
-		}
-		selected, err := ui.promptSubComponents(filepath.Base(compDir), cleanComponents)
+	if hasHelm, err := standard.PromptYesNo(questionAddHelm); err != nil || hasHelm {
+		requester := helm.NewRequester()
+		h, err := requester.Request()
 		if err != nil {
-			return nil, fmt.Errorf("error running component %s selection: %w", compDir, err)
+			return nil, err
 		}
-		for id, comp := range selected {
-			selected[id] = filepath.Join(filepath.Base(compDir), comp)
-		}
-		core.Require = append(core.Require, selected...)
+		ui.results.Helm = h.(*helm.UIHelmResults)
 	}
 
-	return core, nil
-}
-
-func (ui *UIComponentRequester) promptSubComponents(name string, components []string) ([]string, error) {
-	selected, err := PromptComponents(name, components)
-	if err != nil {
-		return nil, fmt.Errorf("error running component %s selection: %w", name, err)
-	}
-	return selected, nil
-}
-
-func (ui *UIComponentRequester) requestComponentsFolders() error {
-	stop := false
-	for !stop {
-		folder, err := standard.PromptName("", "components folder")
+	if hasKustomize, err := standard.PromptYesNo(questionAddKustomize); err != nil || hasKustomize {
+		requester := kustomize.NewRequester()
+		k, err := requester.Request()
 		if err != nil {
-			return err
+			return nil, err
 		}
-		ui.results.Components = append(ui.results.Components, project.ProjectComponent{
-			Name: folder,
-		})
-		if resp, err := standard.PromptYesNo(questionAddMoreComponents); err != nil || !resp {
-			stop = true
+		ui.results.Kustomize = k.(*kustomize.UIKustomizeResults)
+	}
+
+	return ui.results, nil
+}
+
+func (ui *UIComponentRequester) Config() (config.ConfigObject, error) {
+	var (
+		err error
+		cfg *component.Component
+	)
+
+	if cfg, err = services.GetComponent(ui.results.Name); err != nil {
+		cfg = &component.Component{}
+		component.SetComponentDefaults(cfg)
+	}
+
+	cfg.Name = ui.results.Name
+	cfg.Namespace = ui.results.Namespace
+
+	if ui.results.Helm != nil {
+		cfg.Helm = &component.HelmConfig{
+			Chart: ui.results.Helm.Chart,
+			Repo:  ui.results.Helm.Repo,
+			URL:   ui.results.Helm.RepoURL,
+		}
+		if ui.results.Helm.CRDs != nil {
+			cfg.Helm.CRDsChart = ui.results.Helm.CRDs
 		}
 	}
-	return nil
+
+	if ui.results.Kustomize != nil {
+		cfg.Kustomize = &component.KustomizeConfig{
+			URLs: ui.results.Kustomize.URLs,
+		}
+	}
+
+	return cfg, nil
 }

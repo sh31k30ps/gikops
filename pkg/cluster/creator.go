@@ -1,8 +1,8 @@
 package cluster
 
 import (
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster/intrenal/creators/basiccreator"
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster/intrenal/creators/kindcreator"
+	"github.com/sh31k30ps/gikopsctl/pkg/cluster/internal/creators/basiccreator"
+	"github.com/sh31k30ps/gikopsctl/pkg/cluster/internal/creators/kindcreator"
 	"github.com/sh31k30ps/gikopsctl/pkg/config"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
 	"github.com/sh31k30ps/gikopsctl/pkg/log"

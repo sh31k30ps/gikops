@@ -171,7 +171,7 @@ func (m *Manager) applySingleComponent(name, env string) error {
 }
 
 func (m *Manager) waitResources() error {
-	pg, err := getPodsGeneratorsFromFile("computed.yaml")
+	pg, err := getPodsGeneratorsFromFile("")
 	if err != nil {
 		return fmt.Errorf("failed to get pods generators: %w", err)
 	}

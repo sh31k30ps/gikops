@@ -79,4 +79,13 @@ var ToolRegistry = map[string]Tool{
 		},
 		IsMandatory: false,
 	},
+	"git": {
+		Name:        "git",
+		MinVersion:  "2.39.0",
+		VersionArgs: []string{"--version"},
+		VersionGet: func(output string) string {
+			return strings.Split(strings.TrimPrefix(output, "git version "), " ")[0]
+		},
+		IsMandatory: true,
+	},
 }

@@ -1,6 +1,8 @@
 package cluster
 
 import (
+	"fmt"
+
 	"github.com/sh31k30ps/gikopsctl/pkg"
 	"github.com/sh31k30ps/gikopsctl/pkg/cluster"
 	cfgcluster "github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
@@ -24,22 +26,29 @@ func CmdWithAddCluster(cmd *cobra.Command, logger log.Logger) *cobra.Command {
 		}
 		if icmd, ok := icmd.(*cluster.Command); ok {
 			if len(args) == 0 {
-				return icmd.Create()
+				if err := icmd.Create(); err != nil {
+					return err
+				}
+				logger.V(0).Info("Cluster created successfully")
+				return nil
 			}
-			return icmd.CreateSpecific(cfgcluster.ClusterType(args[0]))
+			if err := icmd.CreateSpecific(cfgcluster.ClusterType(args[0])); err != nil {
+				return err
+			}
+			logger.V(0).Info("Cluster created successfully")
+			return nil
 		}
-		if err := icmd.Create(); err != nil {
-			return err
-		}
-		logger.V(0).Info("Cluster created successfully")
-		return nil
+		return fmt.Errorf("invalid command")
 	}
 	cmd.ValidArgsFunction = func(
 		cmd *cobra.Command,
 		args []string,
 		toComplete string,
 	) ([]string, cobra.ShellCompDirective) {
-		return cfgcluster.ClusterTypesLabels, cobra.ShellCompDirectiveNoFileComp
+		if len(args) == 0 {
+			return cfgcluster.ClusterTypesLabels, cobra.ShellCompDirectiveNoFileComp
+		}
+		return nil, cobra.ShellCompDirectiveNoFileComp
 	}
 	return cmd
 }

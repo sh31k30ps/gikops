@@ -27,7 +27,7 @@ func GetRootComponents(projectConfig *project.Project, root string) []string {
 			return components
 		}
 		for _, entry := range entries {
-			if entry.IsDir() && IsComponentDir(root, entry.Name(), manager.GetComponentFileName(projectConfig)) {
+			if entry.IsDir() && IsComponentDir(root, entry.Name(), manager.GetComponentFileName()) {
 				components = append(components, entry.Name())
 			}
 		}

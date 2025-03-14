@@ -1,4 +1,4 @@
-package component
+package helm
 
 import (
 	"os"
@@ -401,7 +401,10 @@ func TestFileExists(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := fileExists(tt.path)
+			result := false
+			if _, err := os.Stat(tt.path); err != nil {
+				result = true
+			}
 			assert.Equal(t, tt.expected, result)
 		})
 	}

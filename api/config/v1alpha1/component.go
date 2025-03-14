@@ -16,6 +16,10 @@ type Component struct {
 	// If unset, the component will not use Helm for deployment
 	Helm *HelmConfig `json:"helm,omitempty" yaml:"helm,omitempty"`
 
+	// Kustomize contains the Kustomize configuration for this component
+	// If unset, the component will not use Kustomize for deployment
+	Kustomize *KustomizeConfig `json:"kustomize,omitempty" yaml:"kustomize,omitempty"`
+
 	// Files contains the file-based configuration for this component
 	// If unset, the component will not use direct file management
 	Files *ComponentFiles `json:"files,omitempty" yaml:"files,omitempty"`
@@ -27,8 +31,8 @@ type Component struct {
 	// DependsOn is a list of components that must be deployed before this component
 	DependsOn []string `json:"dependsOn,omitempty" yaml:"dependsOn,omitempty"`
 
-	// EnvironmentAvailability is the environment availability for the component
-	EnvironmentAvailability []string `json:"environmentAvailability,omitempty" yaml:"environmentAvailability,omitempty"`
+	// Clusters is the list of clusters where the component will be deployed
+	Clusters []string `json:"clusters,omitempty" yaml:"clusters,omitempty"`
 }
 
 // ComponentMetadata contains metadata for the component

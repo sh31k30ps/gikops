@@ -3,11 +3,11 @@ package manager
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/sh31k30ps/gikopsctl/api/config/v1alpha1"
 	"github.com/sh31k30ps/gikopsctl/pkg/config"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
 )
 
 func LoadComponent(file string) (*component.Component, []error) {
@@ -23,14 +23,10 @@ func LoadComponent(file string) (*component.Component, []error) {
 }
 
 func SaveComponent(path string, cpnt *component.Component) error {
-	if envPath := os.Getenv(component.ComponentFileEnvVar); envPath != "" {
-		path = envPath
-	}
-	if path == "" {
-		path = component.DefaultComponentFile
-	}
+	fileName := getComponentFile("")
+
 	return GetConfigManager().Save(
-		path,
+		filepath.Join(path, fileName),
 		cpnt,
 		v1alpha1.Version,
 		v1alpha1.ComponentKind,
@@ -62,7 +58,7 @@ func getComponentFile(file string) string {
 	return component.DefaultComponentFile
 }
 
-func GetComponentFileName(cfg *project.Project) string {
+func GetComponentFileName() string {
 	comptName := os.Getenv(component.ComponentFileEnvVar)
 	if comptName == "" {
 		comptName = component.ComponentFileName

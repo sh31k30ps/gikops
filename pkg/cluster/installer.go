@@ -3,8 +3,8 @@ package cluster
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster/intrenal/installers/kindinstaller"
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster/intrenal/installers/noopinstaller"
+	"github.com/sh31k30ps/gikopsctl/pkg/cluster/internal/installers/kindinstaller"
+	"github.com/sh31k30ps/gikopsctl/pkg/cluster/internal/installers/noopinstaller"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
 	"github.com/sh31k30ps/gikopsctl/pkg/log"
 	"github.com/sh31k30ps/gikopsctl/pkg/services"

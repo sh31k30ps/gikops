@@ -1,29 +1,14 @@
 package component
 
 func SetComponentDefaults(c *Component) {
-	if len(c.EnvironmentAvailability) == 0 {
-		c.EnvironmentAvailability = []string{"local"}
-	}
-	if c.Helm != nil {
-		SetHelmConfigDefaults(c.Helm)
-	}
-	if c.Exec != nil {
-		SetComponentExecDefaults(c.Exec)
-	}
 	if c.Files == nil {
-		c.Files = NewComponentFiles()
+		c.Files = NewFilesConfig()
 	}
-	SetComponentFilesDefaults(c.Files)
+	SetFilesConfigDefaults(c.Files)
 }
 
-func SetComponentFilesDefaults(f *ComponentFiles) {
+func SetFilesConfigDefaults(f *FilesConfig) {
 	if f.CRDs == "" {
 		f.CRDs = DefaultCRDsFileName
 	}
-}
-
-func SetComponentExecDefaults(e *ComponentExec) {
-}
-
-func SetHelmConfigDefaults(h *HelmConfig) {
 }

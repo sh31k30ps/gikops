@@ -7,51 +7,51 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func PromptName(placeholder string, forWhat string) (string, error) {
-	p := tea.NewProgram(newNameModel(placeholder, forWhat))
-	m, err := p.Run()
-	if err != nil {
-		return "", fmt.Errorf("error running name selection: %w", err)
-	}
-	nameModel, ok := m.(nameModel)
-	if !ok {
-		return "", fmt.Errorf("could not convert name model")
-	}
-	if nameModel.textInput.Value() != "" {
-		return nameModel.textInput.Value(), nil
-	}
-	return placeholder, nil
-}
-
 type (
 	errMsg error
 )
 
-type nameModel struct {
-	textInput textinput.Model
-	err       error
-	forWhat   string
+func Prompt(placeholder, label string) (string, error) {
+	p := tea.NewProgram(newPromptModel(placeholder, label))
+	m, err := p.Run()
+	if err != nil {
+		return "", fmt.Errorf("error running name selection: %w", err)
+	}
+	promptModel, ok := m.(promptModel)
+	if !ok {
+		return "", fmt.Errorf("could not convert name model")
+	}
+	if promptModel.textInput.Value() != "" {
+		return promptModel.textInput.Value(), nil
+	}
+	return placeholder, nil
 }
 
-func newNameModel(defaultName string, forWhat string) nameModel {
+type promptModel struct {
+	textInput textinput.Model
+	err       error
+	label     string
+}
+
+func newPromptModel(defaultName string, label string) promptModel {
 	ti := textinput.New()
 	ti.Placeholder = defaultName
 	ti.Focus()
 	ti.CharLimit = 156
 	ti.Width = 20
 
-	return nameModel{
+	return promptModel{
 		textInput: ti,
 		err:       nil,
-		forWhat:   forWhat,
+		label:     label,
 	}
 }
 
-func (m nameModel) Init() tea.Cmd {
+func (m promptModel) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m nameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m promptModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -71,10 +71,10 @@ func (m nameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m nameModel) View() string {
+func (m promptModel) View() string {
 	return fmt.Sprintf(
-		"What is the name for the %s?\n\n%s",
-		m.forWhat,
+		"%s\n\n%s",
+		m.label,
 		m.textInput.View(),
 	)
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/sh31k30ps/gikopsctl/pkg/ui"
 	"github.com/sh31k30ps/gikopsctl/pkg/ui/cluster/clustertype/clusterbasic"
 	"github.com/sh31k30ps/gikopsctl/pkg/ui/cluster/clustertype/clusterkind"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/internal/standard"
+	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
 )
 
 const (
