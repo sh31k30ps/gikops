@@ -20,7 +20,7 @@ func NewCommand(logger log.Logger) *cobra.Command {
 	}
 
 	cmd.PersistentFlags().BoolP("all", "a", false, "Apply all components")
-	cmd.PersistentFlags().StringP("folder", "f", "", "Folder to apply")
+	cmd.PersistentFlags().StringP("folder", "", "", "Folder to apply")
 	cmd.RegisterFlagCompletionFunc("folder", flagCompletionFolder)
 
 	cmd.AddCommand(
@@ -28,6 +28,7 @@ func NewCommand(logger log.Logger) *cobra.Command {
 		newApplyCmd(logger),
 		newCheckCmd(logger),
 		newCreateCmd(logger),
+		newDeleteCmd(logger),
 	)
 
 	return cmd
@@ -56,6 +57,13 @@ func validArgsFunction(cmd *cobra.Command, args []string, toComplete string) ([]
 	result := directories.GetRootsComponents(projectCfg)
 
 	folder, _ := cmd.Flags().GetString("folder")
+	if d := services.GetComponentFolderFromDepth(); folder == "" && d != "" {
+		folder = d
+	}
+
+	if c := services.GetComponentFromDepth(); c != "" && len(args) == 0 {
+		return []string{}, cobra.ShellCompDirectiveDefault
+	}
 
 	if folder != "" {
 		result = directories.GetRootComponents(projectCfg, folder)

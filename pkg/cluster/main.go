@@ -20,6 +20,7 @@ type Command struct {
 	logger log.Logger
 	status *cli.Status
 	ui     *uicluster.UIClusterRequester
+	cmpt   *component.Command
 }
 
 func NewCommand(logger log.Logger) *Command {
@@ -27,6 +28,7 @@ func NewCommand(logger log.Logger) *Command {
 		logger: logger,
 		status: cli.StatusForLogger(logger),
 		ui:     uicluster.NewRequester(),
+		cmpt:   component.NewCommand(logger),
 	}
 }
 
@@ -72,7 +74,7 @@ func (c *Command) CreateSpecific(cType cfgcluster.ClusterType) error {
 	return nil
 }
 
-func (c *Command) Edit() error {
+func (c *Command) Edit(mode string, args ...interface{}) error {
 	return nil
 }
 
@@ -109,7 +111,7 @@ func (c *Command) Delete(id interface{}) error {
 		if err := os.RemoveAll(filepath.Join("clusters", id)); err != nil {
 			return err
 		}
-		if err := c.CleanComponentsCluster(sCl); err != nil {
+		if err := c.cmpt.CleanComponentsCluster(sCl); err != nil {
 			return err
 		}
 		c.logger.V(1).Info("Cluster directory deleted")
@@ -118,7 +120,7 @@ func (c *Command) Delete(id interface{}) error {
 	return fmt.Errorf("id is required")
 }
 
-func (c *Command) Add() error {
+func (c *Command) Add(mode string, args ...string) error {
 	return nil
 }
 
@@ -149,34 +151,10 @@ func (c *Command) GenerateCluster(cluster cfgcluster.Cluster) error {
 		return err
 	}
 	components := directories.GetRootsComponents(project)
-	mngr := component.NewManager(c.logger)
 	for _, cmpt := range components {
-		if err := mngr.AddCluster(cmpt, cluster); err != nil {
-			if !component.IsErrorClusterFolderExists(err) && !component.IsErrorLocalFolder(err) {
-				return err
-			}
-			continue
+		if err := c.cmpt.AddCluster(cmpt, cluster); err != nil {
+			return err
 		}
-		c.logger.V(1).Info(fmt.Sprintf("Cluster %s added to %s", cluster.Name(), cmpt))
-	}
-	return nil
-}
-
-func (c *Command) CleanComponentsCluster(cluster cfgcluster.Cluster) error {
-	project, err := services.GetCurrentProject()
-	if err != nil {
-		return err
-	}
-	components := directories.GetRootsComponents(project)
-	mngr := component.NewManager(c.logger)
-	for _, cmpt := range components {
-		if err := mngr.DeleteCluster(cmpt, cluster); err != nil {
-			if !component.IsErrorClusterFolderNotFound(err) {
-				return err
-			}
-			continue
-		}
-		c.logger.V(1).Info(fmt.Sprintf("Cluster %s removed from %s", cluster.Name(), cmpt))
 	}
 	return nil
 }

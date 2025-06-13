@@ -21,7 +21,7 @@ type Rename struct {
 // Concat specifies a file concatenation operation
 type Concat struct {
 	// Folder is the directory containing source files
-	Folder string `json:"folder" yaml:"folder"`
+	Folder string `json:"folder" yaml:"folder,omitempty"`
 
 	// Includes is a pattern matching files to include
 	Includes []string `json:"includes,omitempty" yaml:"includes,omitempty"`

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/sh31k30ps/gikopsctl/pkg/component/internal/initializer/common"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -26,7 +27,7 @@ func TestProcessHelmChart(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			processHelmChart("test", tt.cfg, "")
+			processHelmChart("test", tt.cfg, "", false)
 		})
 	}
 }
@@ -172,7 +173,7 @@ func TestProcessHelmTemplate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := processHelmTemplate(tt.name, tt.cfg, tt.prefix)
+			err := processHelmTemplate(tt.name, tt.cfg, tt.prefix, false)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -310,7 +311,7 @@ metadata:
 			require.NoError(t, err)
 
 			// Exécuter le test
-			err = processCutTemplate(tmpFile)
+			err = common.CutTemplate(tmpFile)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -365,7 +366,7 @@ func TestGetUniqueFilePath(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			result := getUniqueFilePath(tt.inputPath)
+			result := common.UniqueFilePath(tt.inputPath)
 			assert.Equal(t, filepath.Join(tmpDir, tt.expectedSuffix), result)
 		})
 	}

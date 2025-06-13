@@ -16,6 +16,7 @@ func NewCommand(logger log.Logger) *cobra.Command {
 	cmd.AddCommand(
 		add.NewCommand(logger),
 		delete.NewCommand(logger),
+		newEditNameCommand(logger),
 	)
 
 	return cmd

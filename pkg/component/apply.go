@@ -14,7 +14,7 @@ import (
 	"github.com/sh31k30ps/gikopsctl/pkg/services"
 )
 
-func (m *Manager) ApplyComponents(components []string, env string, mode ApplyMode, only bool) error {
+func (m *Manager) ApplyComponents(components []string, env string, mode ApplyMode, only, onlyBuild bool) error {
 	m.logger.V(0).Info("Applying components")
 	if !only {
 		m.status.Start("Checking dependencies")
@@ -48,7 +48,7 @@ func (m *Manager) ApplyComponents(components []string, env string, mode ApplyMod
 	if mode == ApplyModeAll || mode == ApplyModeManifests {
 		m.logger.V(0).Info(fmt.Sprintf("Components to apply: %v", components))
 		for _, component := range components {
-			if err := m.ApplyComponent(component, env); err != nil {
+			if err := m.ApplyComponent(component, env, onlyBuild); err != nil {
 				return err
 			}
 		}
@@ -66,12 +66,12 @@ func (m *Manager) ApplyComponentCRDs(componentName, env string) error {
 	return nil
 }
 
-func (m *Manager) ApplyComponent(componentName, env string) error {
+func (m *Manager) ApplyComponent(componentName, env string, onlyBuild bool) error {
 	m.status.Start(fmt.Sprintf("Applying component %s", componentName))
 	if err := checkComponentEnvironment(componentName, env); err != nil {
 		return fmt.Errorf("failed to check component environment: %w", err)
 	}
-	if err := m.applySingleComponent(componentName, env); err != nil {
+	if err := m.applySingleComponent(componentName, env, onlyBuild); err != nil {
 		m.status.End(false)
 		return fmt.Errorf("failed to apply component %s: %w", componentName, err)
 	}
@@ -97,7 +97,7 @@ func (m *Manager) applySingleCRDs(name string, env string) error {
 	return nil
 }
 
-func (m *Manager) applySingleComponent(name, env string) error {
+func (m *Manager) applySingleComponent(name, env string, onlyBuild bool) error {
 	if err := kubectl.ChangeContext(env); err != nil {
 		return fmt.Errorf("failed to change context: %w", err)
 	}
@@ -149,13 +149,15 @@ func (m *Manager) applySingleComponent(name, env string) error {
 		return fmt.Errorf("failed to build: %w", err)
 	}
 
-	m.logger.V(1).Info("Applying")
-	if err := kubectl.Apply("computed.yaml"); err != nil {
-		return fmt.Errorf("failed to apply: %w", err)
-	}
+	if !onlyBuild {
+		m.logger.V(1).Info("Applying")
+		if err := kubectl.Apply("computed.yaml"); err != nil {
+			return fmt.Errorf("failed to apply: %w", err)
+		}
 
-	if err := m.waitResources(); err != nil {
-		return fmt.Errorf("failed to wait for resources: %w", err)
+		if err := m.waitResources(); err != nil {
+			return fmt.Errorf("failed to wait for resources: %w", err)
+		}
 	}
 
 	if cfg.Exec != nil && len(cfg.Exec.After) > 0 {

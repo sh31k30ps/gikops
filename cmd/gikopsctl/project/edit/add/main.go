@@ -12,6 +12,7 @@ func NewCommand(logger log.Logger) *cobra.Command {
 	}
 
 	cmd.AddCommand(newClusterCommand(logger))
+	cmd.AddCommand(newComponentsCommand(logger))
 
 	return cmd
 }

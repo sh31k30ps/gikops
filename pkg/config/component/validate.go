@@ -83,9 +83,9 @@ func ValidateHelmInitHooks(h HelmInitHooks) []error {
 	}
 	if len(h.Concats) > 0 {
 		for _, concat := range h.Concats {
-			if concat.Folder == "" {
-				errs = append(errs, errors.New("helm init hooks concat folder is required"))
-			}
+			// if concat.Folder == "" {
+			// 	errs = append(errs, errors.New("helm init hooks concat folder is required"))
+			// }
 			if concat.Output == "" {
 				errs = append(errs, errors.New("helm init hooks concat output is required"))
 			}

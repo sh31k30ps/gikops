@@ -44,9 +44,9 @@ var (
 
 type Command interface {
 	Create(args ...interface{}) error
-	Edit() error
+	Edit(mode string, args ...interface{}) error
 	Delete(id interface{}) error
-	Add() error
+	Add(mode string, args ...string) error
 	Install() error
 }
 

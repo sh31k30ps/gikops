@@ -5,22 +5,31 @@ import (
 	"sort"
 	"strings"
 
-	cmpt "github.com/sh31k30ps/gikopsctl/pkg/config/component"
+	componentConfig "github.com/sh31k30ps/gikopsctl/pkg/config/component"
 )
 
 type DependencyGraph struct {
-	dependencies map[string][]string
-	errors       []error
+	dependencies        map[string][]string
+	reverseDependencies map[string][]string
+	errors              []error
 }
 
 func NewDependencyGraph() *DependencyGraph {
 	return &DependencyGraph{
-		dependencies: make(map[string][]string),
-		errors:       []error{},
+		dependencies:        make(map[string][]string),
+		reverseDependencies: make(map[string][]string),
+		errors:              []error{},
 	}
 }
 
-type ComponentGetter func(name string) (*cmpt.Component, error)
+type ComponentGetter func(name string) (*componentConfig.Component, error)
+
+func (dg *DependencyGraph) ReverseResolve(component string, existingComponents []string, getter ComponentGetter) ([]string, []error) {
+	if _, errs := dg.Resolve(existingComponents, getter); len(errs) > 0 {
+		return nil, errs
+	}
+	return dg.reverseDependencies[component], nil
+}
 
 func (dg *DependencyGraph) Resolve(components []string, getter ComponentGetter) ([]string, []error) {
 	var result []string
@@ -60,7 +69,7 @@ func (dg *DependencyGraph) Resolve(components []string, getter ComponentGetter) 
 		var dependencies []string
 		for _, dep := range config.DependsOn {
 			if !containsSlash(dep) {
-				dep = cmpt.GetComponentPrefix(component) + "/" + dep
+				dep = componentConfig.GetComponentPrefix(component) + "/" + dep
 			}
 
 			if _, err := getter(dep); err != nil {
@@ -75,6 +84,7 @@ func (dg *DependencyGraph) Resolve(components []string, getter ComponentGetter) 
 			}
 		}
 		dg.addDependency(component, dependencies)
+		dg.addReverseDependencies(component, dependencies)
 		visited[component] = true
 		result = append(result, component)
 		return nil
@@ -108,6 +118,15 @@ func (dg *DependencyGraph) Resolve(components []string, getter ComponentGetter) 
 
 func (dg *DependencyGraph) addDependency(component string, dependsOn []string) {
 	dg.dependencies[component] = dependsOn
+}
+
+func (dg *DependencyGraph) addReverseDependencies(component string, dependsOn []string) {
+	for _, dep := range dependsOn {
+		if _, ok := dg.reverseDependencies[dep]; !ok {
+			dg.reverseDependencies[dep] = []string{}
+		}
+		dg.reverseDependencies[dep] = append(dg.reverseDependencies[dep], component)
+	}
 }
 
 func (dg *DependencyGraph) addError(err error) {

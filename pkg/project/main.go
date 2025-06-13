@@ -3,6 +3,7 @@ package project
 import (
 	"fmt"
 	"os"
+	"slices"
 
 	"github.com/sh31k30ps/gikopsctl/assets"
 	"github.com/sh31k30ps/gikopsctl/pkg/cli"
@@ -16,11 +17,29 @@ import (
 	uiproject "github.com/sh31k30ps/gikopsctl/pkg/ui/project"
 )
 
-type Command struct {
-	logger log.Logger
-	status *cli.Status
-	ui     *uiproject.UIProjectRequester
-}
+type (
+	Command struct {
+		logger log.Logger
+		status *cli.Status
+		ui     *uiproject.UIProjectRequester
+	}
+	EditProjectMode string
+	AddProjectMode  string
+)
+
+const (
+	EditName     EditProjectMode = "name"
+	AddComponant AddProjectMode  = "component"
+)
+
+var (
+	AvailableEditModes = []EditProjectMode{
+		EditName,
+	}
+	AvailableAddModes = []AddProjectMode{
+		AddComponant,
+	}
+)
 
 func NewCommand(logger log.Logger) *Command {
 	return &Command{
@@ -59,11 +78,36 @@ func (c *Command) Create(args ...interface{}) error {
 
 }
 
-func (c *Command) Add() error {
-	return nil
+func (c *Command) Add(mode string, args ...string) error {
+	if !slices.Contains(AvailableAddModes, AddProjectMode(mode)) {
+		return fmt.Errorf("invalid mode %s", mode)
+	}
+	switch AddProjectMode(mode) {
+	case AddComponant:
+		return c.addComponent(args...)
+	default:
+		return fmt.Errorf("invalid mode %s", mode)
+	}
 }
 
-func (c *Command) Edit() error {
+func (c *Command) Edit(mode string, args ...interface{}) error {
+	if !slices.Contains(AvailableEditModes, EditProjectMode(mode)) {
+		return fmt.Errorf("invalid mode %s", mode)
+	}
+	cfg, err := services.GetCurrentProject()
+	if err != nil {
+		return err
+	}
+	switch EditProjectMode(mode) {
+	case EditName:
+		cfg.Name = args[0].(string)
+	default:
+		return fmt.Errorf("invalid mode %s", mode)
+	}
+	if err := manager.SaveProject(services.GetConfigFile(), cfg); err != nil {
+		return err
+	}
+	c.logger.V(0).Info("Project file edited successfully")
 	return nil
 }
 
@@ -99,7 +143,7 @@ func (c *Command) Install() error {
 		return err
 	}
 	c.status.End(true)
-
+	c.logger.V(0).Info("Installation complete")
 	return nil
 }
 
@@ -112,5 +156,40 @@ func (c *Command) copyBasicFiles() error {
 	if err := os.WriteFile(".gitignore", gitignore, 0644); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (c *Command) addComponent(args ...string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("component name is required")
+	}
+	name := args[0]
+
+	c.status.Start(fmt.Sprintf("Adding component %s", name))
+
+	cfg, err := services.GetCurrentProject()
+	if err != nil {
+		c.status.End(false)
+		return err
+	}
+
+	cfg.Components = append(cfg.Components, cfgproject.ProjectComponent{
+		Name: name,
+	})
+
+	c.logger.V(1).Info(fmt.Sprintf("Saving project file %s", services.GetConfigFile()))
+	if err := manager.SaveProject(services.GetConfigFile(), cfg); err != nil {
+		c.status.End(false)
+		return err
+	}
+
+	c.logger.V(1).Info(fmt.Sprintf("Creating component directory %s", name))
+	if err := os.MkdirAll(name, 0755); err != nil {
+		c.status.End(false)
+		return err
+	}
+	c.status.End(true)
+
+	c.logger.V(0).Info(fmt.Sprintf("componenst directory %s Created successfully", name))
 	return nil
 }

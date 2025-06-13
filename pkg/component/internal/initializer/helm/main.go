@@ -20,7 +20,7 @@ func NewInitializer(logger log.Logger, status *cli.Status) *Initializer {
 	}
 }
 
-func (i *Initializer) Init(name string) error {
+func (i *Initializer) Init(name string, keepTmp bool) error {
 	cCfg, err := services.GetComponent(name)
 	if err != nil {
 		return fmt.Errorf("failed to get component: %w", err)
@@ -30,7 +30,7 @@ func (i *Initializer) Init(name string) error {
 			return fmt.Errorf("failed to process before hooks: %w", err)
 		}
 
-		if err := setupHelmRepo(name, cCfg); err != nil {
+		if err := setupHelmRepo(name, cCfg, keepTmp); err != nil {
 			return err
 		}
 

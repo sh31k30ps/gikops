@@ -1,13 +1,13 @@
 BINARY_NAME=gikopsctl
-VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "0.1.0")
+VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "0.1.1")
 GIT_COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_TIME=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
 GO_VERSION=$(shell go version | cut -d ' ' -f 3)
 
-LDFLAGS=-ldflags "-X github.com/sh31k30ps/gikopsctl/pkg/internal/version.Version=${VERSION} \
-                  -X github.com/sh31k30ps/gikopsctl/pkg/internal/version.GitCommit=${GIT_COMMIT} \
-                  -X github.com/sh31k30ps/gikopsctl/pkg/internal/version.BuildTime=${BUILD_TIME} \
-                  -X github.com/sh31k30ps/gikopsctl/pkg/internal/version.GoVersion=${GO_VERSION}"
+LDFLAGS=-ldflags "-X github.com/sh31k30ps/gikopsctl/pkg/version.Version=${VERSION} \
+                  -X github.com/sh31k30ps/gikopsctl/pkg/version.GitCommit=${GIT_COMMIT} \
+                  -X github.com/sh31k30ps/gikopsctl/pkg/version.BuildTime=${BUILD_TIME} \
+                  -X github.com/sh31k30ps/gikopsctl/pkg/version.GoVersion=${GO_VERSION}"
 
 .PHONY: generate
 generate:
@@ -21,7 +21,7 @@ generate:
 
 .PHONY: build
 build:
-	@go build ${LDFLAGS} -o ./bin/${BINARY_NAME} ./cmd/gikopsctl
+	go build ${LDFLAGS} -o ./bin/${BINARY_NAME} ./cmd/gikopsctl
 
 .PHONY: install
 install:

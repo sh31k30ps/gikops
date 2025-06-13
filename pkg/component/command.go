@@ -8,9 +8,11 @@ import (
 
 	"github.com/sh31k30ps/gikopsctl/assets"
 	"github.com/sh31k30ps/gikopsctl/pkg/cli"
+	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/manager"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
+	"github.com/sh31k30ps/gikopsctl/pkg/directories"
 	"github.com/sh31k30ps/gikopsctl/pkg/log"
 	"github.com/sh31k30ps/gikopsctl/pkg/services"
 	uicomponent "github.com/sh31k30ps/gikopsctl/pkg/ui/component"
@@ -18,16 +20,18 @@ import (
 )
 
 type Command struct {
-	logger log.Logger
-	status *cli.Status
-	ui     *uicomponent.UIComponentRequester
+	manager *Manager
+	logger  log.Logger
+	status  *cli.Status
+	ui      *uicomponent.UIComponentRequester
 }
 
 func NewCommand(logger log.Logger) *Command {
 	return &Command{
-		logger: logger,
-		status: cli.StatusForLogger(logger),
-		ui:     uicomponent.NewRequester(logger),
+		logger:  logger,
+		status:  cli.StatusForLogger(logger),
+		ui:      uicomponent.NewRequester(logger),
+		manager: NewManager(logger),
 	}
 }
 
@@ -36,6 +40,15 @@ func (c *Command) Create(args ...interface{}) error {
 		return fmt.Errorf("component folder is required")
 	}
 	folder := args[0].(string)
+
+	project, err := services.GetCurrentProject()
+	if err != nil {
+		return err
+	}
+
+	if project.GetComponent(folder) == nil {
+		return fmt.Errorf("Component folder %s not found", folder)
+	}
 
 	if _, err := c.ui.Request(""); err != nil {
 		return err
@@ -50,11 +63,16 @@ func (c *Command) Create(args ...interface{}) error {
 		return err
 	}
 
+	for _, cl := range project.Clusters {
+		if err := c.AddCluster(filepath.Join(folder, cfgC.Name), cl); err != nil {
+			return err
+		}
+	}
 	c.logger.V(0).Info("Component created successfully")
 	return nil
 }
 
-func (c *Command) Edit() error {
+func (c *Command) Edit(mode string, args ...interface{}) error {
 	return nil
 }
 
@@ -62,7 +80,7 @@ func (c *Command) Delete(id interface{}) error {
 	return nil
 }
 
-func (c *Command) Add() error {
+func (c *Command) Add(mode string, args ...string) error {
 	return nil
 }
 
@@ -130,6 +148,36 @@ func (c *Command) InstallComponent(cpmtRootName, cpmtName string) error {
 		if err := os.WriteFile(dest, content, 0644); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (c *Command) AddCluster(cmpt string, cl cluster.Cluster) error {
+	if err := c.manager.AddCluster(cmpt, cl); err != nil {
+		if !IsErrorClusterFolderExists(err) && !IsErrorLocalFolder(err) {
+			return err
+		}
+		return nil
+	}
+	c.logger.V(1).Info(fmt.Sprintf("Cluster %s added to %s", cl.Name(), cmpt))
+	return nil
+}
+
+func (c *Command) CleanComponentsCluster(cl cluster.Cluster) error {
+	project, err := services.GetCurrentProject()
+	if err != nil {
+		return err
+	}
+	components := directories.GetRootsComponents(project)
+	mngr := NewManager(c.logger)
+	for _, cmpt := range components {
+		if err := mngr.DeleteCluster(cmpt, cl); err != nil {
+			if !IsErrorClusterFolderNotFound(err) {
+				return err
+			}
+			continue
+		}
+		c.logger.V(1).Info(fmt.Sprintf("Cluster %s removed from %s", cl.Name(), cmpt))
 	}
 	return nil
 }

@@ -27,3 +27,41 @@ func Build(name string) error {
 	}
 	return nil
 }
+
+func Init() error {
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kustomize command: %w", err)
+	}
+	cmd := exec.Command(c, append(args, "init")...)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to init: %s : %w", string(output), err)
+	}
+	return nil
+}
+
+func AddResources(resources []string) error {
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kustomize command: %w", err)
+	}
+	args = append(args, append([]string{"edit", "add", "resource"}, resources...)...)
+	cmd := exec.Command(c, args...)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to add resource: %s : %w", string(output), err)
+	}
+
+	return nil
+}
+
+func AddResource(resource string) error {
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kustomize command: %w", err)
+	}
+	cmd := exec.Command(c, append(args, "edit", "add", "resource", resource)...)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to add resource: %s : %w", string(output), err)
+	}
+	return nil
+}

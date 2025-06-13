@@ -76,30 +76,25 @@ func handleRename(rename component.HelmHookRename) error {
 }
 
 func handleConcat(concat component.HelmHookConcat) error {
-	// Change to base folder
-	baseFolder := filepath.Join("base", concat.Folder)
-	if err := os.Chdir(baseFolder); err != nil {
-		return fmt.Errorf("failed to change to directory %s: %w", baseFolder, err)
-	}
-
-	// Get files matching pattern
 	if len(concat.Includes) == 0 {
 		concat.Includes = []string{"*.yaml"}
 	}
-
-	for id, _ := range concat.Includes {
-		concat.Includes[id] = filepath.Join(baseFolder, concat.Includes[id])
+	var files []string
+	for _, pattern := range concat.Includes {
+		detectedfiles, err := filepath.Glob(filepath.Join("base", concat.Folder, pattern))
+		if err != nil {
+			return fmt.Errorf("failed to glob files with pattern %s: %w", concat.Includes, err)
+		}
+		if len(files) == 0 {
+			files = detectedfiles
+			continue
+		}
+		files = append(files, detectedfiles...)
 	}
-
-	files, err := filepath.Glob(strings.Join(concat.Includes, ","))
-	if err != nil {
-		return fmt.Errorf("failed to glob files with pattern %s: %w", concat.Includes, err)
-	}
-
-	// Create/truncate output file
-	outputFile := concat.Output
-	if err := os.MkdirAll(filepath.Dir(outputFile), 0755); err != nil {
-		return fmt.Errorf("failed to create directory %s: %w", filepath.Dir(outputFile), err)
+	outputFile := filepath.Join("base", concat.Output)
+	outputDir := filepath.Dir(filepath.Join("base", outputFile))
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", outputDir, err)
 	}
 	output, err := os.Create(outputFile)
 	if err != nil {
@@ -116,6 +111,10 @@ func handleConcat(concat component.HelmHookConcat) error {
 
 		if _, err := output.Write(content); err != nil {
 			return fmt.Errorf("failed to write to output file: %w", err)
+		}
+
+		if err := os.Remove(file); err != nil {
+			return fmt.Errorf("failed to remove file '%s': %w", file, err)
 		}
 	}
 

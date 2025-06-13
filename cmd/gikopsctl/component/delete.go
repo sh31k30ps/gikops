@@ -7,15 +7,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newInitCmd(logger log.Logger) *cobra.Command {
+func newDeleteCmd(logger log.Logger) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "init [component-name]",
-		Short: "Initialize a component",
+		Use:   "delete",
+		Short: "Delete a component",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			all, _ := cmd.Flags().GetBool("all")
 			folder, _ := cmd.Flags().GetString("folder")
-			only, _ := cmd.Flags().GetBool("only")
-			keepTmp, _ := cmd.Flags().GetBool("keep-tmp")
 			if d := services.GetComponentFolderFromDepth(); folder == "" && d != "" {
 				folder = d
 			}
@@ -26,14 +24,20 @@ func newInitCmd(logger log.Logger) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			env, _ := cmd.Flags().GetString("env")
+			mode, _ := cmd.Flags().GetString("mode")
+			force, _ := cmd.Flags().GetBool("force")
 			mgr := component.NewManager(logger)
-			return mgr.InitComponents(components, only, keepTmp)
+			return mgr.DeleteComponents(components, env, component.ApplyMode(mode), force)
 		},
 		ValidArgsFunction: validArgsFunction,
 	}
 
-	cmd.Flags().BoolP("only", "o", false, "Only initialize the component in the current folder")
-	cmd.Flags().BoolP("keep-tmp", "k", false, "Keep the temporary Helm chart file")
+	cmd.Flags().StringP("env", "e", "local", "Environment to target")
+	cmd.Flags().StringP("mode", "m", component.ApplyModeAll.String(), "Mode to apply (all, crds, manifests)")
+	cmd.Flags().BoolP("force", "", false, "Force delete component")
+	cmd.RegisterFlagCompletionFunc("mode", flagCompletionMode)
+	cmd.RegisterFlagCompletionFunc("env", flagCompletionEnv)
 
 	return cmd
 }

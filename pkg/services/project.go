@@ -15,7 +15,7 @@ var (
 )
 
 const (
-	maxDepth = 2
+	maxDepth = 4
 )
 
 func GetCurrentProject() (*project.Project, error) {
@@ -41,10 +41,18 @@ func getProjectFile(fileName string, depth int) (*project.Project, error) {
 	if err != nil {
 		return getProjectFile(filepath.Join("..", fileName), depth+1)
 	}
-	if err := os.Chdir(filepath.Dir(fileName)); err != nil {
-		return nil, fmt.Errorf("failed to change directory: %w", err)
+
+	if cfg, ok := currentProject.(*project.Project); ok {
+		cfg.Level = depth
+		if d, err := os.Getwd(); err == nil {
+			cfg.Origin = d
+		}
+		if err := os.Chdir(filepath.Dir(fileName)); err != nil {
+			return nil, fmt.Errorf("failed to change directory: %w", err)
+		}
+		return cfg, nil
 	}
-	return currentProject.(*project.Project), nil
+	return nil, fmt.Errorf("failed to cast to project.Project")
 }
 
 func ReloadCurrentProject() (*project.Project, error) {

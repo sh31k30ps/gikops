@@ -66,7 +66,7 @@ func (t ComponentType) IsValid() bool {
 }
 
 type Initializer interface {
-	Init(name string) error
+	Init(name string, keepTmp bool) error
 }
 
 type Applier interface {

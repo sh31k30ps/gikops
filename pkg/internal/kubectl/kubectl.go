@@ -111,6 +111,19 @@ func Apply(file string) error {
 	return nil
 }
 
+func Delete(file string) error {
+	c, args, err := getCmdArgs()
+	if err != nil {
+		return fmt.Errorf("failed to get kubectl command: %w", err)
+	}
+
+	cmd := exec.Command(c, append(args, "delete", "-f", file)...)
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to delete: %s : %w", string(output), err)
+	}
+	return nil
+}
+
 func WaittingForResourcesBeReady(resources []string) error {
 	c, args, err := getCmdArgs()
 	if err != nil {
