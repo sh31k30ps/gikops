@@ -47,7 +47,7 @@ func (c *Command) Create(args ...interface{}) error {
 	}
 
 	if project.GetComponent(folder) == nil {
-		return fmt.Errorf("Component folder %s not found", folder)
+		return fmt.Errorf("component folder %s not found", folder)
 	}
 
 	if _, err := c.ui.Request(""); err != nil {

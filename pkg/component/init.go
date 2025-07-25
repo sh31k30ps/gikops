@@ -70,7 +70,7 @@ func (m *Manager) initSingleComponent(name string, keepTmp bool) error {
 
 func initClusters(cfg *component.Component) error {
 	if cfg == nil {
-		return fmt.Errorf("missing configuration", cfg.Name)
+		return fmt.Errorf("missing configuration ")
 	}
 	clusters := cfg.Clusters
 	if len(clusters) == 0 {
