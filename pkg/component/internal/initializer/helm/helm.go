@@ -3,6 +3,7 @@ package helm
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/sh31k30ps/gikopsctl/pkg/component/internal/initializer/common"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
@@ -17,15 +18,18 @@ func setupHelmRepo(name string, cfg *component.Component, keepTmp bool) error {
 		return fmt.Errorf("failed to clean base directory: %w", err)
 	}
 
-	addCmd := exec.Command("helm", "repo", "add", cfg.Helm.Repo, cfg.Helm.URL)
-	if err := addCmd.Run(); err != nil {
-		return fmt.Errorf("failed to add helm repo: %w", err)
+	if strings.HasPrefix(cfg.Helm.URL, "https://") {
+		addCmd := exec.Command("helm", "repo", "add", cfg.Helm.Repo, cfg.Helm.URL)
+		if err := addCmd.Run(); err != nil {
+			return fmt.Errorf("failed to add helm repo: %w", err)
+		}
+
+		updateCmd := exec.Command("helm", "repo", "update")
+		if err := updateCmd.Run(); err != nil {
+			return fmt.Errorf("failed to update helm repos: %w", err)
+		}
 	}
 
-	updateCmd := exec.Command("helm", "repo", "update")
-	if err := updateCmd.Run(); err != nil {
-		return fmt.Errorf("failed to update helm repos: %w", err)
-	}
 	cmdArgs := []string{}
 	if cfg.Helm.CRDsChart == nil || cfg.Helm.CRDsChart.Chart == "" {
 		cmdArgs = append(cmdArgs, "--include-crds")
