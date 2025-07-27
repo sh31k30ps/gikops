@@ -1,54 +1,47 @@
-# Git Ops Helper
+# GikOps Controller
 
-A Go-based tool for managing Kubernetes components and environments, replacing traditional Makefile and bash script approaches with a more robust solution.
+GikOps is a tool that allows managing various Kubernetes clusters as well
+as the different tools and applications deployed on them.
+It enforces the GitOps principle by keeping all configurations in a versioned project.
+It is also possible to manage dependencies between tools on a global scale.
+The goal of this tool is to enable managing local Kubernetes clusters (development),
+pre-production, and production clusters within the same configuration project to
+ensure consistency across different clusters while maintaining differences.
+It is important to have all the most similar environments possible to avoid
+compatibility issues.
 
 ## Prerequisites
 
-The following tools must be installed and available in your PATH:
-
-- Docker (>= 20.10.0)
-- kubectl (>= 1.20.0)
-- Helm (>= 3.0.0)
-- Kind (>= 0.20.0)
-- Kustomize (>= 5.0.0)
+The following tools must be installed before using the tool:
+- kubectl
+- git
 
 The tool will verify these dependencies before running any command.
+You can use command `gikopsctl check` to verify dependencies and versions.
 
 ## Features
 
-- Kubernetes environment management with Kind
-- Component initialization and application
-- Helm chart management
-- CRD handling
-- Post-initialization processing (uploads, resolves, renames)
-- Automatic tool verification
-- Version information with build details
-- Shell completion for Bash, Zsh, Fish, and PowerShell
-
-## Project Structure
-
-```
-.
-├── cmd/
-│   └── gikopsctl/      # Main application entry point
-├── pkg/
-│   ├── cmd/                 # Command implementations
-│   ├── component/           # Component management logic
-│   ├── installer/           # Environment installation logic
-│   ├── tools/              # Tool verification and utilities
-│   ├── version/            # Version information
-│   └── types/              # Common type definitions
-├── components/             # Component definitions
-└── overrides/             # Kubernetes overrides
-```
+- **Kind Kubernetes local environment**: Helper to install and manage local Kind 
+    Cluster from boilerplate.
+- **Project Configuration**: Organize and manage your project configuration.
+	+ Create, Update, Delete, and Apply project configurations.
+	+ Support for cluster management and environment setup.
+- **Component Management**: Manage your Kubernetes components with ease.
+  + Create, Update, Delete, and Apply component configurations.
+  + Support for Helm, Kustomize, and CRD files.
+- **Post-initialization or deployement processing** :
+  + Several hooks during Helm init process (uploads, resolves, renames, concat).
+  + Shell scripts execution during deployement phases. (before, after).
+- **Automatic tool verification**: Check external tools versions or alternatives.
+- **Shell Completion**: Get seamless completion for `gikopsctl` commands in your shell.
 
 ## Installation
 
 ```bash
-go install github.com/sh31k30ps/gikopsctl/cmd/gikopsctl@latest
+go install github.com/sh31k30ps/gikopsctl
 ```
 
-## Usage
+<a id="shell-completion"></a>
 
 ### Shell Completion
 
@@ -60,6 +53,9 @@ gikopsctl completion bash > /etc/bash_completion.d/gikopsctl
 
 # Zsh
 gikopsctl completion zsh > "${fpath[1]}/_gikopsctl"
+
+# Oh My Zsh
+gikopsctl completion zsh > "~/.oh-my-zsh/custom/completions/_gikopsctl"
 
 # Fish
 gikopsctl completion fish > ~/.config/fish/completions/gikopsctl.fish
@@ -73,79 +69,27 @@ For detailed installation instructions for each shell, run:
 gikopsctl completion --help
 ```
 
-### Version Information
+### Shell alias 
+
+For better efficiancy, you can add in your shell config file those alias:
 
 ```bash
-# Display version and build information
-gikopsctl version
+alias gok="gikopsctl"
+alias gop="gikopsctl project"
+alias gocu="gikopsctl cluster"
+alias goco="gikopsctl component"
 ```
 
-### Environment Management
+## Usage
 
-```bash
-# Install environment
-gikopsctl install
 
-# Uninstall environment
-gikopsctl uninstall
-```
 
-### Component Management
+## Contributing
 
-```bash
-# Initialize all components
-gikopsctl component init
+Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for
+information on how to contribute to this project.
 
-# Initialize specific component
-gikopsctl component init [component-name]
+## License
 
-# Apply all components
-gikopsctl component apply --env local --mode all
-
-# Apply specific component
-gikopsctl component apply [component-name] --env local --mode all
-```
-
-### Modes
-
-- `all`: Apply both CRDs and manifests
-- `crd`: Apply only CRDs
-- `manifests`: Apply only manifests
-
-## Component Configuration
-
-Components are defined in `component.yaml` files within the `components/` directory. Example:
-
-```yaml
-kind: Component
-apiVersion: bbr.k8s.io/v1alpha1
-metadata:
-  name: example
-  namespace: example-ns
-helm:
-  repo: example-repo
-  repo-url: https://example.com/charts
-  version: v1.0.0
-  chart: example/chart
-  post-init:
-    uploads:
-      - name: crds.yaml
-        url: https://example.com/crds.yaml
-```
-
-## Development
-
-To build from source:
-
-```bash
-# Build with version information
-make build
-
-# Install to GOPATH/bin
-make install
-
-# Run tests
-make test
-
-# Run linting
-make lint
+This project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE (AGPL-3.0-or-later).
+See the `LICENSE` file for details.
