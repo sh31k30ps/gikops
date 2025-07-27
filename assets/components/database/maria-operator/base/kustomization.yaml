@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- cert-controller/deployment.yaml
+- cert-controller/rbac.yaml
+- cert-controller/rbac_1.yaml
+- cert-controller/rbac_2.yaml
+- cert-controller/rbac_3.yaml
+- cert-controller/serviceaccount.yaml
+- crds.yaml
+- operator/configmap.yaml
+- operator/deployment.yaml
+- operator/rbac-user.yaml
+- operator/rbac-user_1.yaml
+- operator/rbac.yaml
+- operator/rbac_1.yaml
+- operator/rbac_2.yaml
+- operator/rbac_3.yaml
+- operator/rbac_4.yaml
+- operator/serviceaccount.yaml
+- webhook/config.yaml
+- webhook/config_1.yaml
+- webhook/deployment.yaml
+- webhook/service.yaml
+- webhook/serviceaccount.yaml

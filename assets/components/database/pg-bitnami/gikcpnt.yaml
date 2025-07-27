@@ -1,0 +1,11 @@
+kind: Component
+apiVersion: gikopsctl.config.k8s.io/v1alpha1
+metadata:
+  name: pg-bitnami
+helm:
+  repo: bitnami
+  repo-url: https://charts.bitnami.com/bitnami
+  version: 16.7.21
+  chart: bitnami/postgresql
+files:
+  skipCRDs: true

@@ -1,0 +1,9 @@
+kind: Component
+apiVersion: gikopsctl.config.k8s.io/v1alpha1
+metadata:
+  name: pg-operator
+helm:
+  repo: cnpg
+  repo-url: https://cloudnative-pg.github.io/charts
+  version: 0.23.2
+  chart: cnpg/cloudnative-pg

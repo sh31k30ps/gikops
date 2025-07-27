@@ -1,0 +1,9 @@
+kind: Component
+apiVersion: gikopsctl.config.k8s.io/v1alpha1
+metadata:
+  name: maria-operator
+helm:
+  repo: mariadb-operator
+  repo-url: https://helm.mariadb.com/mariadb-operator
+  chart: mariadb-operator/mariadb-operator
+  crds-chart: mariadb-operator/mariadb-operator-crds

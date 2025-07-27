@@ -1,0 +1,9 @@
+kind: Component
+apiVersion: gikopsctl.config.k8s.io/v1alpha1
+metadata:
+  name: redis-bitnami
+helm:
+  repo: bitnami
+  repo-url: https://charts.bitnami.com/bitnami
+  version: 21.2.13
+  chart: bitnami/redis
