@@ -18,17 +18,17 @@ import (
 )
 
 const (
-	longDescription = `gikopsctl is a command-line tool that helps manage Kubernetes components
-and environments, replacing traditional Makefile and bash script approaches with
-a more robust Go-based solution.
+	longDescription = `GikOps is a tool that allows managing various Kubernetes clusters as well
+as the different tools and applications deployed on them.
+It enforces the GitOps principle by keeping all configurations in a versioned project.
 
-The project is organized into a main project folder and a components folder.
-The main project folder contains the project configuration and the components folder contains the components.
+It is also possible to manage dependencies between tools on a global scale.
+The goal of this tool is to enable managing local Kubernetes clusters (development),
+pre-production, and production clusters within the same configuration project to
+ensure consistency across different clusters while maintaining differences.
 
-The project configuration is stored in the gikops.yaml file.
-The components are stored in the components folder.
-
-The components are used to manage the Kubernetes components.
+It is important to have all the most similar environments possible to avoid
+compatibility issues.
 `
 )
 

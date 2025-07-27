@@ -11,9 +11,10 @@ import (
 // newInstallCommand returns a new cobra.Command for environment installation
 func newInstallCommand(logger log.Logger) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "install",
-		Short: "Install the Kubernetes environment and components",
+		Use:   "install  [cluster-name]",
+		Short: "Install the Kubernetes environment",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.Args = cobra.ExactArgs(1)
 			if len(args) == 0 {
 				return fmt.Errorf("cluster name is required")
 			}

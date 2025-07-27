@@ -11,9 +11,10 @@ import (
 // newUninstallCommand returns a new cobra.Command for environment uninstallation
 func newUninstallCommand(logger log.Logger) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "uninstall",
+		Use:   "uninstall [cluster-name]",
 		Short: "Uninstall the Kubernetes environment",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.Args = cobra.ExactArgs(1)
 			if len(args) == 0 {
 				return fmt.Errorf("cluster name is required")
 			}

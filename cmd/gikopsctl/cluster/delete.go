@@ -11,14 +11,18 @@ import (
 
 func newDeleteCommand(logger log.Logger) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete",
+		Use:   "delete [cluster-name]",
 		Short: "Delete a cluster from the project",
 	}
 	return CmdWithDeleteCluster(cmd, logger)
 }
 
 func CmdWithDeleteCluster(cmd *cobra.Command, logger log.Logger) *cobra.Command {
+	cmd.Args = cobra.ExactArgs(1)
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		if len(args) == 0 {
+			return fmt.Errorf("cluster name is required")
+		}
 		icmd, err := pkg.GetCommand(pkg.CommandCluster, logger)
 		if err != nil {
 			return err
