@@ -3,9 +3,9 @@ package helm
 import (
 	"fmt"
 
-	cfgcomponent "github.com/sh31k30ps/gikopsctl/pkg/config/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
+	cfgcomponent "github.com/sh31k30ps/gikops/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/ui"
+	"github.com/sh31k30ps/gikops/pkg/ui/standard"
 )
 
 type UIHelmRequester struct {

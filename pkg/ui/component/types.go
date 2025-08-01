@@ -1,8 +1,8 @@
 package component
 
 import (
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/helm"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/kustomize"
+	"github.com/sh31k30ps/gikops/pkg/ui/helm"
+	"github.com/sh31k30ps/gikops/pkg/ui/kustomize"
 )
 
 type UIComponentResults struct {

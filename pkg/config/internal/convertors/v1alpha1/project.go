@@ -3,10 +3,10 @@ package v1alpha1
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/api/config/v1alpha1"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/internal/encoding"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
+	"github.com/sh31k30ps/gikops/api/config/v1alpha1"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/config/internal/encoding"
+	"github.com/sh31k30ps/gikops/pkg/config/project"
 )
 
 type ProjectConverter struct{}

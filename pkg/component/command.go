@@ -6,17 +6,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sh31k30ps/gikopsctl/assets"
-	"github.com/sh31k30ps/gikopsctl/pkg/cli"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/manager"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
-	"github.com/sh31k30ps/gikopsctl/pkg/directories"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
-	uicomponent "github.com/sh31k30ps/gikopsctl/pkg/ui/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
+	"github.com/sh31k30ps/gikops/assets"
+	"github.com/sh31k30ps/gikops/pkg/cli"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/config/manager"
+	"github.com/sh31k30ps/gikops/pkg/config/project"
+	"github.com/sh31k30ps/gikops/pkg/directories"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/services"
+	uicomponent "github.com/sh31k30ps/gikops/pkg/ui/component"
+	"github.com/sh31k30ps/gikops/pkg/ui/standard"
 )
 
 type Command struct {

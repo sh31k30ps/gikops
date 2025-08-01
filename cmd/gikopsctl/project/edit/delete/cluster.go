@@ -1,8 +1,8 @@
 package delete
 
 import (
-	"github.com/sh31k30ps/gikopsctl/cmd/gikopsctl/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/cmd/gikopsctl/cluster"
+	"github.com/sh31k30ps/gikops/pkg/log"
 	"github.com/spf13/cobra"
 )
 

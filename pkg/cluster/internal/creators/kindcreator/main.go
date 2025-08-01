@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/assets"
-	"github.com/sh31k30ps/gikopsctl/pkg/config"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/assets"
+	"github.com/sh31k30ps/gikops/pkg/config"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/log"
 )
 
 type Creator struct {

@@ -4,9 +4,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/cli"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/env"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/cli"
+	"github.com/sh31k30ps/gikops/pkg/internal/env"
+	"github.com/sh31k30ps/gikops/pkg/log"
 )
 
 var loggers map[string]log.Logger

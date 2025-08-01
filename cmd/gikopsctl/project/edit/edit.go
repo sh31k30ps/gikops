@@ -1,9 +1,9 @@
 package edit
 
 import (
-	"github.com/sh31k30ps/gikopsctl/cmd/gikopsctl/project/edit/add"
-	"github.com/sh31k30ps/gikopsctl/cmd/gikopsctl/project/edit/delete"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/cmd/gikopsctl/project/edit/add"
+	"github.com/sh31k30ps/gikops/cmd/gikopsctl/project/edit/delete"
+	"github.com/sh31k30ps/gikops/pkg/log"
 	"github.com/spf13/cobra"
 )
 

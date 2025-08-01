@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/config/component"
 )
 
 func CleanBaseDir(cfg *component.Component) error {

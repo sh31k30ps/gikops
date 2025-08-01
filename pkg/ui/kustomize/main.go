@@ -1,6 +1,6 @@
 package kustomize
 
-import "github.com/sh31k30ps/gikopsctl/pkg/ui"
+import "github.com/sh31k30ps/gikops/pkg/ui"
 
 type UIKustomizeRequester struct {
 	results *UIKustomizeResults

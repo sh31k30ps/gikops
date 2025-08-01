@@ -3,9 +3,9 @@ package component
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/services"
 	"github.com/spf13/cobra"
 )
 

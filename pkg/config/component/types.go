@@ -1,6 +1,6 @@
 package component
 
-import "github.com/sh31k30ps/gikopsctl/pkg/config"
+import "github.com/sh31k30ps/gikops/pkg/config"
 
 const (
 	ComponentFileName      = "gikcpnt"

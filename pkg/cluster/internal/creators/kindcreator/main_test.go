@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg/config"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

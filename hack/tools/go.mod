@@ -1,4 +1,4 @@
-module github.com/sh31k30ps/gikopsctl/hack/tools
+module github.com/sh31k30ps/gikops/hack/tools
 
 go 1.23
 

@@ -5,16 +5,16 @@ import (
 	"os"
 	"slices"
 
-	"github.com/sh31k30ps/gikopsctl/assets"
-	"github.com/sh31k30ps/gikopsctl/pkg/cli"
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/manager"
-	cfgproject "github.com/sh31k30ps/gikopsctl/pkg/config/project"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/git"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
-	uiproject "github.com/sh31k30ps/gikopsctl/pkg/ui/project"
+	"github.com/sh31k30ps/gikops/assets"
+	"github.com/sh31k30ps/gikops/pkg/cli"
+	"github.com/sh31k30ps/gikops/pkg/cluster"
+	"github.com/sh31k30ps/gikops/pkg/component"
+	"github.com/sh31k30ps/gikops/pkg/config/manager"
+	cfgproject "github.com/sh31k30ps/gikops/pkg/config/project"
+	"github.com/sh31k30ps/gikops/pkg/internal/git"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/services"
+	uiproject "github.com/sh31k30ps/gikops/pkg/ui/project"
 )
 
 type (

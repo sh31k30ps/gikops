@@ -3,9 +3,9 @@ package helm
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/cli"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg/cli"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/services"
 )
 
 type Initializer struct {

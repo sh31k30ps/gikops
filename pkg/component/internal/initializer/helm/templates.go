@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/component/internal/initializer/common"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/helm"
+	"github.com/sh31k30ps/gikops/pkg/component/internal/initializer/common"
+	"github.com/sh31k30ps/gikops/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/internal/helm"
 )
 
 func processHelmTemplate(name string, cfg *component.HelmChart, prefix string, keepTmp bool, options ...string) error {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sh31k30ps/gikopsctl/api/config/v1alpha1"
-	"github.com/sh31k30ps/gikopsctl/pkg/config"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
+	"github.com/sh31k30ps/gikops/api/config/v1alpha1"
+	"github.com/sh31k30ps/gikops/pkg/config"
+	"github.com/sh31k30ps/gikops/pkg/config/project"
 )
 
 func LoadProject(file string) (*project.Project, []error) {

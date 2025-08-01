@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
 )
 
 const (

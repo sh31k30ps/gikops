@@ -25,8 +25,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/env"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/internal/env"
+	"github.com/sh31k30ps/gikops/pkg/log"
 )
 
 // Logger is the kind cli's log.Logger implementation

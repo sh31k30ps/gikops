@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/assets"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
+	"github.com/sh31k30ps/gikops/assets"
+	"github.com/sh31k30ps/gikops/pkg/config/project"
+	"github.com/sh31k30ps/gikops/pkg/ui"
+	"github.com/sh31k30ps/gikops/pkg/ui/standard"
 )
 
 const (

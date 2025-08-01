@@ -3,9 +3,9 @@ package services
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/manager"
-	"github.com/sh31k30ps/gikopsctl/pkg/directories"
+	"github.com/sh31k30ps/gikops/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/config/manager"
+	"github.com/sh31k30ps/gikops/pkg/directories"
 )
 
 var (

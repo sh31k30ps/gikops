@@ -1,8 +1,8 @@
 package manager
 
 import (
-	"github.com/sh31k30ps/gikopsctl/pkg/config/internal/convertors/v1alpha1"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/internal/encoding"
+	"github.com/sh31k30ps/gikops/pkg/config/internal/convertors/v1alpha1"
+	"github.com/sh31k30ps/gikops/pkg/config/internal/encoding"
 )
 
 var (

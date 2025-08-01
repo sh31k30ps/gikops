@@ -47,7 +47,7 @@ You can use command `gikopsctl check` to verify dependencies and versions.
 ## Installation
 
 ```bash
-go install github.com/sh31k30ps/gikopsctl
+go install github.com/sh31k30ps/gikops
 ```
 
 <a id="shell-completion"></a>

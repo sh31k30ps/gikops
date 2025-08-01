@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config"
+	"github.com/sh31k30ps/gikops/pkg/config"
 )
 
 // DefaultConfigManager implémente ConfigManager

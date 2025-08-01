@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg/services"
 )
 
 func checkEnvironment(env string) error {

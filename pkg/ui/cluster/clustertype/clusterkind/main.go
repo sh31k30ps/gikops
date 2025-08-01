@@ -3,8 +3,8 @@ package clusterkind
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/ui/standard"
 )
 
 const (

@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/manager"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
+	"github.com/sh31k30ps/gikops/pkg/config"
+	"github.com/sh31k30ps/gikops/pkg/config/manager"
+	"github.com/sh31k30ps/gikops/pkg/config/project"
 )
 
 func GetComponentConfigFile(projectConfig *project.Project, name string) (string, error) {

@@ -6,10 +6,10 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/cli"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/cli"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/log"
 	kcluster "sigs.k8s.io/kind/pkg/cluster"
 	kcmd "sigs.k8s.io/kind/pkg/cmd"
 	klog "sigs.k8s.io/kind/pkg/log"

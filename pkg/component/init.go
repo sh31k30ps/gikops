@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/dependencies"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/kustomize"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/internal/dependencies"
+	"github.com/sh31k30ps/gikops/pkg/internal/kustomize"
+	"github.com/sh31k30ps/gikops/pkg/services"
 )
 
 func (m *Manager) InitComponents(components []string, only bool, keepTmp bool) error {

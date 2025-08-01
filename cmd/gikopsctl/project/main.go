@@ -1,8 +1,8 @@
 package project
 
 import (
-	"github.com/sh31k30ps/gikopsctl/cmd/gikopsctl/project/edit"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/cmd/gikopsctl/project/edit"
+	"github.com/sh31k30ps/gikops/pkg/log"
 	"github.com/spf13/cobra"
 )
 

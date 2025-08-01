@@ -3,8 +3,8 @@ package check
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/tools"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/tools"
 	"github.com/spf13/cobra"
 )
 

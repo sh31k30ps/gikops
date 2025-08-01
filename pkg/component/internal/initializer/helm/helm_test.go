@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/config/component"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

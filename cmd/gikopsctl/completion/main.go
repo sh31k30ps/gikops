@@ -3,11 +3,11 @@ package completion
 import (
 	"errors"
 
-	"github.com/sh31k30ps/gikopsctl/cmd/gikopsctl/completion/bash"
-	"github.com/sh31k30ps/gikopsctl/cmd/gikopsctl/completion/fish"
-	"github.com/sh31k30ps/gikopsctl/cmd/gikopsctl/completion/powershell"
-	"github.com/sh31k30ps/gikopsctl/cmd/gikopsctl/completion/zsh"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/cmd/gikopsctl/completion/bash"
+	"github.com/sh31k30ps/gikops/cmd/gikopsctl/completion/fish"
+	"github.com/sh31k30ps/gikops/cmd/gikopsctl/completion/powershell"
+	"github.com/sh31k30ps/gikops/cmd/gikopsctl/completion/zsh"
+	"github.com/sh31k30ps/gikops/pkg/log"
 	"github.com/spf13/cobra"
 )
 

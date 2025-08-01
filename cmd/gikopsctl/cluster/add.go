@@ -3,10 +3,10 @@ package cluster
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg"
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster"
-	cfgcluster "github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg"
+	"github.com/sh31k30ps/gikops/pkg/cluster"
+	cfgcluster "github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/log"
 	"github.com/spf13/cobra"
 )
 

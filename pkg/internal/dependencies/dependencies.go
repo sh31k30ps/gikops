@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	componentConfig "github.com/sh31k30ps/gikopsctl/pkg/config/component"
+	componentConfig "github.com/sh31k30ps/gikops/pkg/config/component"
 )
 
 type DependencyGraph struct {

@@ -76,14 +76,14 @@ generate-checksums:
 	done
 
 compile-changelog:
-	@echo "Generating changelog for $(TAG)"
-	@./hack/makes/changelog.sh "$(BINARY_NAME)" "$(TAG)" "$(CHANGELOG_FILE)"	
+	@echo "Generating changelog for $(VERSION)"
+	@./hack/makes/changelog.sh "$(PROJECT_NAME)" "$(VERSION)" "$(CHANGELOG_FILE)"	
 
 create-github-release:
-	@echo "Creating GitHub release for $(TAG)"
+	@echo "Creating GitHub release for $(VERSION)"
 	@if command -v gh >/dev/null 2>&1; then \
-		gh release create "$(TAG)" \
-			--title "$(TAG)" \
+		gh release create "$(VERSION)" \
+			--title "$(VERSION)" \
 			--draft \
 			--notes-file "$(CHANGELOG_FILE)" \
 			$(RELEASE_DIR)/* || \

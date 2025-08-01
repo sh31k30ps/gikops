@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/kustomize"
+	"github.com/sh31k30ps/gikops/pkg/internal/kustomize"
 )
 
 func createKustomizeFile() error {

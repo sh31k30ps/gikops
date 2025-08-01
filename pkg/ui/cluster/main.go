@@ -3,13 +3,13 @@ package cluster
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/cluster/clustertype/clusterbasic"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/cluster/clustertype/clusterkind"
-	"github.com/sh31k30ps/gikopsctl/pkg/ui/standard"
+	"github.com/sh31k30ps/gikops/pkg/config"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg/ui"
+	"github.com/sh31k30ps/gikops/pkg/ui/cluster/clustertype/clusterbasic"
+	"github.com/sh31k30ps/gikops/pkg/ui/cluster/clustertype/clusterkind"
+	"github.com/sh31k30ps/gikops/pkg/ui/standard"
 )
 
 const (

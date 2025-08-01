@@ -3,10 +3,10 @@ package pkg
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/project"
+	"github.com/sh31k30ps/gikops/pkg/cluster"
+	"github.com/sh31k30ps/gikops/pkg/component"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/project"
 )
 
 type CommandType string

@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/dependencies"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/kubectl"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/kustomize"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/internal/dependencies"
+	"github.com/sh31k30ps/gikops/pkg/internal/kubectl"
+	"github.com/sh31k30ps/gikops/pkg/internal/kustomize"
+	"github.com/sh31k30ps/gikops/pkg/services"
 )
 
 func (m *Manager) ApplyComponents(components []string, env string, mode ApplyMode, only, onlyBuild bool) error {

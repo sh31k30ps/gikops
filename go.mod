@@ -1,4 +1,4 @@
-module github.com/sh31k30ps/gikopsctl
+module github.com/sh31k30ps/gikops
 
 go 1.24.0
 

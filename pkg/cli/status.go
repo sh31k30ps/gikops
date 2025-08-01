@@ -19,7 +19,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/log"
 )
 
 // Status is used to track ongoing status in a CLI, with a nice loading spinner

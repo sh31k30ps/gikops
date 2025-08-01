@@ -5,15 +5,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/cli"
-	"github.com/sh31k30ps/gikopsctl/pkg/component"
-	cfgcluster "github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/manager"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/project"
-	"github.com/sh31k30ps/gikopsctl/pkg/directories"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
-	uicluster "github.com/sh31k30ps/gikopsctl/pkg/ui/cluster"
+	"github.com/sh31k30ps/gikops/pkg/cli"
+	"github.com/sh31k30ps/gikops/pkg/component"
+	cfgcluster "github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/config/manager"
+	"github.com/sh31k30ps/gikops/pkg/config/project"
+	"github.com/sh31k30ps/gikops/pkg/directories"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/services"
+	uicluster "github.com/sh31k30ps/gikops/pkg/ui/cluster"
 )
 
 type Command struct {

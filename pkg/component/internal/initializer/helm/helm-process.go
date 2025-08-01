@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
+	"github.com/sh31k30ps/gikops/pkg/config/component"
 )
 
 func handleUpload(upload component.HelmHookUpload) error {

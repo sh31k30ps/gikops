@@ -2,6 +2,7 @@
 
 # Project configuration
 BINARY_NAME = gikopsctl
+PROJECT_NAME = sh31k30ps/gikops 
 VERSION = $(shell git describe --tags --always --dirty 2>/dev/null || echo "0.0.0")
 GIT_COMMIT = $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_TIME = $(shell date -u '+%Y-%m-%d_%H:%M:%S')
@@ -9,10 +10,10 @@ GO_VERSION = $(shell go version | cut -d ' ' -f 3)
 FILE_PATH ?= ./...
 
 # Build flags
-LDFLAGS = -ldflags "-X github.com/sh31k30ps/gikopsctl/pkg/version.Version=${VERSION} \
-                    -X github.com/sh31k30ps/gikopsctl/pkg/version.GitCommit=${GIT_COMMIT} \
-                    -X github.com/sh31k30ps/gikopsctl/pkg/version.BuildTime=${BUILD_TIME} \
-                    -X github.com/sh31k30ps/gikopsctl/pkg/version.GoVersion=${GO_VERSION}"
+LDFLAGS = -ldflags "-X github.com/sh31k30ps/gikops/pkg/version.Version=${VERSION} \
+                    -X github.com/sh31k30ps/gikops/pkg/version.GitCommit=${GIT_COMMIT} \
+                    -X github.com/sh31k30ps/gikops/pkg/version.BuildTime=${BUILD_TIME} \
+                    -X github.com/sh31k30ps/gikops/pkg/version.GoVersion=${GO_VERSION}"
 
 # Include sub-makefiles
 include hack/makes/build.mk

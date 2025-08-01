@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/directories"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/dependencies"
-	"github.com/sh31k30ps/gikopsctl/pkg/internal/kubectl"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg/directories"
+	"github.com/sh31k30ps/gikops/pkg/internal/dependencies"
+	"github.com/sh31k30ps/gikops/pkg/internal/kubectl"
+	"github.com/sh31k30ps/gikops/pkg/services"
 )
 
 func (m *Manager) DeleteComponents(components []string, env string, mode ApplyMode, force bool) error {

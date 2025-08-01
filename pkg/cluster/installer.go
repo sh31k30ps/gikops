@@ -3,11 +3,11 @@ package cluster
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster/internal/installers/kindinstaller"
-	"github.com/sh31k30ps/gikopsctl/pkg/cluster/internal/installers/noopinstaller"
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/services"
+	"github.com/sh31k30ps/gikops/pkg/cluster/internal/installers/kindinstaller"
+	"github.com/sh31k30ps/gikops/pkg/cluster/internal/installers/noopinstaller"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/services"
 )
 
 type Installer interface {

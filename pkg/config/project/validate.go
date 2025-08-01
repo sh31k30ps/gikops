@@ -3,7 +3,7 @@ package project
 import (
 	"errors"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/config/cluster"
+	"github.com/sh31k30ps/gikops/pkg/config/cluster"
 )
 
 func Validate(p Project) []error {

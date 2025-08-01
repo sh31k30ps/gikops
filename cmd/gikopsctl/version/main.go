@@ -3,8 +3,8 @@ package version
 import (
 	"fmt"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/log"
-	"github.com/sh31k30ps/gikopsctl/pkg/version"
+	"github.com/sh31k30ps/gikops/pkg/log"
+	"github.com/sh31k30ps/gikops/pkg/version"
 	"github.com/spf13/cobra"
 )
 

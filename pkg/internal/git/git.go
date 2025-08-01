@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/tools"
+	"github.com/sh31k30ps/gikops/pkg/tools"
 )
 
 func Clone(url string, path string) error {
