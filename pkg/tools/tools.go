@@ -2,7 +2,7 @@ package tools
 
 import "strings"
 
-var ToolRegistry = map[string]Tool{
+var ToolRegistry = map[string]*Tool{
 	"docker": {
 		Name:        "docker",
 		MinVersion:  "28.0.0",
@@ -61,24 +61,25 @@ var ToolRegistry = map[string]Tool{
 		VersionGet: func(output string) string {
 			return strings.TrimPrefix(strings.TrimSpace(output), "v")
 		},
-		IsMandatory:  true,
-		Alternatives: []string{"kubectl-kustomize"},
+		IsMandatory: true,
+		// Alternatives: []string{"kubectl-kustomize"},
 	},
-	"kubectl-kustomize": {
-		Name:        "kubectl",
-		MinVersion:  "1.32.0",
-		CmdArgs:     []string{"kustomize"},
-		VersionArgs: []string{"version", "--client"},
-		VersionGet: func(output string) string {
-			parts := strings.Split(output, "Kustomize Version: ")
-			if len(parts) > 1 {
-				version := strings.Split(parts[1], "\n")[0]
-				return strings.TrimPrefix(version, "v")
-			}
-			return ""
-		},
-		IsMandatory: false,
-	},
+	// "kubectl-kustomize": {
+	// 	Name:        "kubectl",
+	// 	MinVersion:  "1.32.0",
+	// 	CmdArgs:     []string{"kustomize"},
+	// 	VersionArgs: []string{"version", "--client"},
+	// 	VersionGet: func(output string) string {
+	// 		parts := strings.Split(output, "Kustomize Version: ")
+	// 		if len(parts) > 1 {
+	// 			version := strings.Split(parts[1], "\n")[0]
+	// 			return strings.TrimPrefix(version, "v")
+	// 		}
+	// 		return ""
+	// 	},
+	// 	IsMandatory:   false,
+	// 	IsAlternative: true,
+	// },
 	"git": {
 		Name:        "git",
 		MinVersion:  "2.39.0",

@@ -6,23 +6,24 @@ import (
 )
 
 type Tool struct {
-	Name         string
-	MinVersion   string
-	VersionArgs  []string
-	VersionGet   func(string) string
-	CmdArgs      []string
-	IsMandatory  bool
-	Alternatives []string
+	Name          string
+	MinVersion    string
+	VersionArgs   []string
+	VersionGet    func(string) string
+	CmdArgs       []string
+	IsMandatory   bool
+	Alternatives  []string
+	IsAlternative bool
 }
 
 type ToolResolver struct {
-	registry map[string]Tool
+	registry map[string]*Tool
 	cache    map[string]*ResolvedTool
 	executor func(name string, args ...string) *exec.Cmd
 }
 
 type ResolvedTool struct {
-	Tool         Tool
+	Tool         *Tool
 	Version      string
 	IsInstalled  bool
 	IsUpToDate   bool
@@ -66,16 +67,15 @@ func (r *ToolResolver) GetTool(name string) (*ResolvedTool, error) {
 	}
 
 	for _, altName := range tool.Alternatives {
-		alt, exists := r.registry[altName]
-		if !exists {
+		alt, err := r.GetTool(altName)
+		if err != nil {
 			continue
 		}
 
-		resolved = r.resolveTool(alt)
-		if resolved.IsInstalled && resolved.IsUpToDate {
-			resolved.ResolvedName = name
-			r.cache[name] = resolved
-			return resolved, nil
+		if alt.IsInstalled && alt.IsUpToDate {
+			alt.ResolvedName = name
+			r.cache[name] = alt
+			return alt, nil
 		}
 	}
 
@@ -87,7 +87,7 @@ func (r *ToolResolver) GetTool(name string) (*ResolvedTool, error) {
 	return resolved, nil
 }
 
-func (r *ToolResolver) resolveTool(tool Tool) *ResolvedTool {
+func (r *ToolResolver) resolveTool(tool *Tool) *ResolvedTool {
 	cmd := r.executor(tool.Name, tool.VersionArgs...)
 	output, err := cmd.Output()
 

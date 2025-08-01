@@ -2,7 +2,6 @@ package tools
 
 import (
 	"fmt"
-	"slices"
 )
 
 // VerifyTools checks if all required tools are installed and meet version requirements
@@ -21,51 +20,48 @@ func VerifyTools() error {
 }
 
 type ToolInfo struct {
-	Id             string
-	Name           string
-	Version        string
-	MinVersion     string
-	IsMandatory    bool
-	IsInstalled    bool
-	IsUpToDate     bool
-	UseAlternative bool
-	ResolvedName   string
-	Alternatives   []string
+	Id           string
+	Name         string
+	Version      string
+	MinVersion   string
+	IsMandatory  bool
+	IsInstalled  bool
+	IsUpToDate   bool
+	ResolvedName string
+	Alternative  string
 }
 
 func ListTools() []ToolInfo {
 	infos := []ToolInfo{}
-	finalInfos := []ToolInfo{}
-	alternatives := []string{}
+
 	for id, tool := range ToolRegistry {
+		if tool.IsAlternative {
+			continue
+		}
+
 		info := ToolInfo{
-			Id:             id,
-			Name:           tool.Name,
-			IsMandatory:    tool.IsMandatory,
-			MinVersion:     tool.MinVersion,
-			IsInstalled:    false,
-			IsUpToDate:     false,
-			UseAlternative: false,
+			Id:          id,
+			Name:        tool.Name,
+			IsMandatory: tool.IsMandatory,
+			MinVersion:  tool.MinVersion,
+			IsInstalled: false,
+			IsUpToDate:  false,
+			Alternative: "",
 		}
 		t, err := GetToolResolver().GetTool(id)
+
 		if err == nil {
 			info.Version = t.Version
 			info.IsInstalled = t.IsInstalled
 			info.IsUpToDate = t.IsUpToDate
-			info.UseAlternative = t.ResolvedName != id
+			if t.Tool.IsAlternative {
+				info.Alternative = t.Tool.Name
+			}
 			info.ResolvedName = t.ResolvedName
 		}
-		if len(t.Tool.Alternatives) > 0 {
-			alternatives = append(alternatives, t.Tool.Alternatives...)
-		}
+
 		infos = append(infos, info)
 	}
 
-	for _, info := range infos {
-		if slices.Contains(alternatives, info.Id) {
-			continue
-		}
-		finalInfos = append(finalInfos, info)
-	}
-	return finalInfos
+	return infos
 }
