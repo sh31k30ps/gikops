@@ -38,7 +38,7 @@ jobs:
         run: make lint
 
       - name: Install kubectl
-        uses: actions-hub/kubectl@master
+        uses: azure/setup-kubectl@v4
 
       - name: Install Helm
         uses: azure/setup-helm@v4.3.0
