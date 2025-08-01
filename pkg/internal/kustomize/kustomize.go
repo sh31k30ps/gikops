@@ -12,7 +12,7 @@ func getCmdArgs() (string, []string, error) {
 	if err != nil {
 		return "", nil, fmt.Errorf("kustomize is not installed or accessible: %w", err)
 	}
-	return tool.ResolvedName, tool.GetCmdArgs(), nil
+	return tool.Tool.Name, tool.GetCmdArgs(), nil
 }
 
 func Build(name string) error {

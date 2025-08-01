@@ -1,8 +1,6 @@
 package assets
 
 import (
-	"reflect"
-	"sort"
 	"strings"
 	"testing"
 )
@@ -201,18 +199,4 @@ func TestGetFilesByExtension(t *testing.T) {
 			}
 		})
 	}
-}
-
-// Helper function to compare slices regardless of order
-func equalSlices(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	aCopy := make([]string, len(a))
-	bCopy := make([]string, len(b))
-	copy(aCopy, a)
-	copy(bCopy, b)
-	sort.Strings(aCopy)
-	sort.Strings(bCopy)
-	return reflect.DeepEqual(aCopy, bCopy)
 }

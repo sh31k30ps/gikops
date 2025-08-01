@@ -28,7 +28,7 @@ func processHelmDefaults(cfg *component.HelmChart, prefix string) error {
 	}
 	output, err := helm.GetDefaults(cfg.Chart, cfg.Version)
 	if err != nil {
-		return fmt.Errorf("failed to get helm values: %w", err)
+		return fmt.Errorf("failed to get helm values: %v", output)
 	}
 	if err := os.MkdirAll(filepath.Dir(defaultsPath), 0755); err != nil {
 		return err

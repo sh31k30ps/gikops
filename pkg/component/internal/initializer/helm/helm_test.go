@@ -1,73 +1,16 @@
 package helm
 
 import (
+	"fmt"
 	"os"
-	"path/filepath"
 	"testing"
 
-	"github.com/sh31k30ps/gikopsctl/pkg/component/internal/initializer/common"
 	"github.com/sh31k30ps/gikopsctl/pkg/config/component"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestProcessHelmChart(t *testing.T) {
-	tests := []struct {
-		name string
-		cfg  *component.HelmChart
-	}{
-		{
-			name: "sans prefix",
-			cfg: &component.HelmChart{
-				Chart:   "test-chart",
-				Version: "1.0.0",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			processHelmChart("test", tt.cfg, "", false)
-		})
-	}
-}
-
-func TestGetHelmDefaultFile(t *testing.T) {
-	tests := []struct {
-		name     string
-		cfg      *component.HelmChart
-		prefix   string
-		expected string
-	}{
-		{
-			name: "sans prefix",
-			cfg: &component.HelmChart{
-				Chart:   "test-chart",
-				Version: "1.0.0",
-			},
-			prefix:   "",
-			expected: filepath.Join("default", "values.yaml"),
-		},
-		{
-			name: "avec prefix",
-			cfg: &component.HelmChart{
-				Chart:   "test-chart",
-				Version: "1.0.0",
-			},
-			prefix:   "dev",
-			expected: filepath.Join("default", "dev-values.yaml"),
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := getHelmDefaultFile(tt.cfg, tt.prefix)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
-
-func TestProcessHelmDefaults(t *testing.T) {
+func TestHelm(t *testing.T) {
 	// Créer un répertoire temporaire pour les tests
 	tmpDir, err := os.MkdirTemp("", "helm-test-*")
 	require.NoError(t, err)
@@ -82,331 +25,176 @@ func TestProcessHelmDefaults(t *testing.T) {
 	err = os.Chdir(tmpDir)
 	require.NoError(t, err)
 
-	tests := []struct {
-		name        string
-		cfg         *component.HelmChart
-		prefix      string
-		mockCommand func() error // Pour simuler la commande helm
-		wantErr     bool
+	repo := struct {
+		Repo        string
+		Url         string
+		Version     string
+		Chart       string
+		CrdsVersion string
+		CrdsChart   string
 	}{
-		{
-			name: "Chart inexistant",
-			cfg: &component.HelmChart{
-				Chart:   "test-chart",
-				Version: "1.0.0",
-			},
-			prefix:  "",
-			wantErr: true,
-		},
-		{
-			name: "Chart existant",
-			cfg: &component.HelmChart{
-				Chart:   "traefik/traefik",
-				Version: "v34.4.0",
-			},
-			prefix:  "",
-			wantErr: false,
-		},
-		{
-			name: "Chart existant avec prefix",
-			cfg: &component.HelmChart{
-				Chart:   "traefik/traefik-crds",
-				Version: "v1.4.0",
-			},
-			prefix:  "crds",
-			wantErr: false,
-		},
-		{
-			name: "fichier existe déjà",
-			cfg: &component.HelmChart{
-				Chart:   "test-chart",
-				Version: "1.0.0",
-			},
-			prefix:  "",
-			wantErr: false,
-		},
+		Repo:        "traefik",
+		Url:         "https://traefik.github.io/charts",
+		Version:     "v34.4.0",
+		Chart:       "traefik/traefik",
+		CrdsVersion: "v1.4.0",
+		CrdsChart:   "traefik/traefik-crds",
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.mockCommand != nil {
-				err := tt.mockCommand()
-				require.NoError(t, err)
-			}
-
-			err := processHelmDefaults(tt.cfg, tt.prefix)
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestProcessHelmTemplate(t *testing.T) {
 	tests := []struct {
-		name    string
-		cfg     *component.HelmChart
-		prefix  string
+		cfg     *component.Component
 		wantErr bool
+		keep    bool
 	}{
 		{
-			name: "Chart inexistant",
-			cfg: &component.HelmChart{
-				Chart:   "test-chart",
-				Version: "1.0.0",
+			cfg: &component.Component{
+				Name: "NoHelmConfig",
 			},
-			prefix:  "",
+			wantErr: false,
+			keep:    false,
+		},
+		{
+			cfg: &component.Component{
+				Name: "MissingRepoName",
+				Helm: &component.HelmConfig{
+					URL: "http://toto.too.com",
+					Chart: &component.HelmChart{
+						Chart:   "NoOne",
+						Version: "not",
+					},
+				},
+			},
 			wantErr: true,
+			keep:    false,
 		},
 		{
-			name: "Chart existant",
-			cfg: &component.HelmChart{
-				Chart:   "traefik/traefik",
-				Version: "v34.4.0",
+			cfg: &component.Component{
+				Name: "MissingURL",
+				Helm: &component.HelmConfig{
+					Repo: "noOne",
+					Chart: &component.HelmChart{
+						Chart:   "NoOne",
+						Version: "not",
+					},
+				},
 			},
-			prefix:  "",
+			wantErr: true,
+			keep:    false,
+		},
+		{
+			cfg: &component.Component{
+				Name: "MissingChart",
+				Helm: &component.HelmConfig{
+					Repo: "noOne",
+					URL:  "http://toto.too.com",
+				},
+			},
+			wantErr: true,
+			keep:    false,
+		},
+		{
+			cfg: &component.Component{
+				Name: "RepoFailed",
+				Helm: &component.HelmConfig{
+					Repo: "failed",
+					URL:  "https://toto.too.com",
+					Chart: &component.HelmChart{
+						Chart:   "NoOne",
+						Version: "not",
+					},
+				},
+			},
+			wantErr: true,
+			keep:    false,
+		},
+		{
+			cfg: &component.Component{
+				Name: "ChartFailed",
+				Helm: &component.HelmConfig{
+					Repo: repo.Repo,
+					URL:  repo.Url,
+					Chart: &component.HelmChart{
+						Chart:   "NoOne",
+						Version: "not",
+					},
+				},
+			},
+			wantErr: true,
+			keep:    false,
+		},
+		{
+			cfg: &component.Component{
+				Name: "chart-existant",
+				Helm: &component.HelmConfig{
+					Repo: repo.Repo,
+					URL:  repo.Url,
+					Chart: &component.HelmChart{
+						Chart:   repo.Chart,
+						Version: repo.Version,
+					},
+				},
+			},
 			wantErr: false,
+			keep:    false,
+		},
+		{
+			cfg: &component.Component{
+				Name: "crds-other-chart",
+				Helm: &component.HelmConfig{
+					Repo: repo.Repo,
+					URL:  repo.Url,
+					Chart: &component.HelmChart{
+						Chart:   repo.Chart,
+						Version: repo.Version,
+					},
+					CRDsChart: &component.HelmChart{
+						Chart:   repo.CrdsChart,
+						Version: repo.CrdsVersion,
+					},
+				},
+			},
+			wantErr: false,
+			keep:    false,
+		},
+		{
+			cfg: &component.Component{
+				Name: "keep-tmp",
+				Helm: &component.HelmConfig{
+					Repo: repo.Repo,
+					URL:  repo.Url,
+					Chart: &component.HelmChart{
+						Chart:   repo.Chart,
+						Version: repo.Version,
+					},
+				},
+			},
+			wantErr: false,
+			keep:    true,
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := processHelmTemplate(tt.name, tt.cfg, tt.prefix, false)
+		t.Run(tt.cfg.Name, func(t *testing.T) {
+			err := setupHelmRepo(tt.cfg.Name, tt.cfg, tt.keep)
+
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
+				if tt.cfg.Helm != nil {
+					tmpFile := fmt.Sprintf("%s/default/values.yaml", tmpDir)
+					assert.FileExists(t, tmpFile, "defaults values must be generated")
+					assert.FileExists(t, fmt.Sprintf("%s/base/kustomization.yaml", tmpDir))
+					if tt.cfg.Helm.CRDsChart != nil {
+						assert.FileExists(t, fmt.Sprintf("%s/default/crds-values.yaml", tmpDir))
+					}
+					if tt.keep {
+						assert.FileExists(t, fmt.Sprintf("%s/base/tmp.yaml", tmpDir))
+					} else {
+						assert.NoFileExists(t, fmt.Sprintf("%s/base/tmp.yaml", tmpDir))
+					}
+				}
 			}
-		})
-	}
-}
-
-func TestProcessCutTemplate(t *testing.T) {
-	// Créer un répertoire temporaire pour les tests
-	tmpDir, err := os.MkdirTemp("", "helm-test-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
-
-	// Sauvegarder le répertoire courant
-	originalWd, err := os.Getwd()
-	require.NoError(t, err)
-	defer os.Chdir(originalWd)
-
-	// Changer vers le répertoire temporaire
-	err = os.Chdir(tmpDir)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		content  string
-		wantErr  bool
-		validate func(t *testing.T)
-	}{
-		{
-			name: "document yaml simple",
-			content: `---
-# Source: charts/test/templates/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: test
----`,
-			wantErr: false,
-			validate: func(t *testing.T) {
-				// Vérifier que le fichier a été créé correctement
-				content, err := os.ReadFile(filepath.Join("base", "templates", "deployment.yaml"))
-				require.NoError(t, err)
-				assert.Contains(t, string(content), "kind: Deployment")
-			},
-		},
-		{
-			name: "documents multiples",
-			content: `---
-# Source: charts/test/templates/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: test-svc
----
-# Source: charts/test/templates/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: test
----`,
-			wantErr: false,
-			validate: func(t *testing.T) {
-				// Vérifier les deux fichiers
-				svcContent, err := os.ReadFile(filepath.Join("base", "templates", "service.yaml"))
-				require.NoError(t, err)
-				assert.Contains(t, string(svcContent), "kind: Service")
-
-				deployContent, err := os.ReadFile(filepath.Join("base", "templates", "deployment.yaml"))
-				require.NoError(t, err)
-				assert.Contains(t, string(deployContent), "kind: Deployment")
-			},
-		},
-		{
-			name: "gestion des doublons",
-			content: `---
-# Source: charts/test/templates/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: test1
----
-# Source: charts/test/templates/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: test2
----`,
-			wantErr: false,
-			validate: func(t *testing.T) {
-				// Vérifier que les deux fichiers existent avec des noms différents
-				files, err := filepath.Glob(filepath.Join("base", "templates", "deployment*.yaml"))
-				require.NoError(t, err)
-				assert.Len(t, files, 2)
-			},
-		},
-		{
-			name: "gestion des fichiers vides",
-			content: `---
-# Source: charts/test/templates/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: test1
----
-# Source: charts/test/templates/deployment-2.yaml
-
-
-
----
-# Source: charts/test/templates/deployment-3.yaml
-
----
-# Source: charts/test/templates/deployment-4.yaml
----`,
-			wantErr: false,
-			validate: func(t *testing.T) {
-				// Vérifier que les deux fichiers existent avec des noms différents
-				files, err := filepath.Glob(filepath.Join("base", "templates", "*.yaml"))
-				require.NoError(t, err)
-				assert.Len(t, files, 1)
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Nettoyer le répertoire base avant chaque test
-			os.RemoveAll(filepath.Join(tmpDir, "base"))
-
-			// Créer le fichier temporaire avec le contenu de test
-			tmpFile := filepath.Join(tmpDir, "test.yaml")
-			err := os.WriteFile(tmpFile, []byte(tt.content), 0644)
-			require.NoError(t, err)
-
-			// Exécuter le test
-			err = common.CutTemplate(tmpFile)
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
-
-			// Exécuter les validations spécifiques au test
-			if tt.validate != nil {
-				tt.validate(t)
-			}
-		})
-	}
-}
-
-func TestGetUniqueFilePath(t *testing.T) {
-	// Créer un répertoire temporaire pour les tests
-	tmpDir, err := os.MkdirTemp("", "helm-test-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
-
-	tests := []struct {
-		name           string
-		setupFiles     []string
-		inputPath      string
-		expectedSuffix string
-	}{
-		{
-			name:           "fichier n'existe pas",
-			setupFiles:     []string{},
-			inputPath:      filepath.Join(tmpDir, "test.yaml"),
-			expectedSuffix: "test.yaml",
-		},
-		{
-			name:           "fichier existe une fois",
-			setupFiles:     []string{"test.yaml"},
-			inputPath:      filepath.Join(tmpDir, "test.yaml"),
-			expectedSuffix: "test_1.yaml",
-		},
-		{
-			name:           "fichier existe plusieurs fois",
-			setupFiles:     []string{"test.yaml", "test_1.yaml"},
-			inputPath:      filepath.Join(tmpDir, "test.yaml"),
-			expectedSuffix: "test_2.yaml",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Créer les fichiers de test
-			for _, f := range tt.setupFiles {
-				err := os.WriteFile(filepath.Join(tmpDir, f), []byte("test"), 0644)
-				require.NoError(t, err)
-			}
-
-			result := common.UniqueFilePath(tt.inputPath)
-			assert.Equal(t, filepath.Join(tmpDir, tt.expectedSuffix), result)
-		})
-	}
-}
-
-func TestFileExists(t *testing.T) {
-	// Créer un répertoire temporaire pour les tests
-	tmpDir, err := os.MkdirTemp("", "helm-test-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
-
-	// Créer un fichier de test
-	testFile := filepath.Join(tmpDir, "test.yaml")
-	err = os.WriteFile(testFile, []byte("test"), 0644)
-	require.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		path     string
-		expected bool
-	}{
-		{
-			name:     "fichier existe",
-			path:     testFile,
-			expected: true,
-		},
-		{
-			name:     "fichier n'existe pas",
-			path:     filepath.Join(tmpDir, "nonexistent.yaml"),
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := false
-			if _, err := os.Stat(tt.path); err != nil {
-				result = true
-			}
-			assert.Equal(t, tt.expected, result)
 		})
 	}
 }

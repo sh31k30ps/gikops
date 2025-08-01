@@ -27,7 +27,7 @@ func GetDefaults(chart string, version string) ([]byte, error) {
 	cmd := exec.Command(c, args...)
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get helm values: %w", err)
+		return nil, fmt.Errorf("failed to get helm values: %v", output)
 	}
 	return output, nil
 }
@@ -48,7 +48,7 @@ func GetTemplates(name, chart, values, version string, options ...string) ([]byt
 	cmd := exec.Command(c, args...)
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get helm templates: %w", err)
+		return nil, fmt.Errorf("failed to get helm templates: %v", output)
 	}
 	return output, nil
 }

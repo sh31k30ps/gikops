@@ -10,8 +10,12 @@ import (
 )
 
 func setupHelmRepo(name string, cfg *component.Component, keepTmp bool) error {
-	if cfg.Helm == nil || cfg.Helm.Repo == "" || cfg.Helm.URL == "" {
+	if cfg.Helm == nil {
 		return nil
+	}
+
+	if cfg.Helm.Repo == "" || cfg.Helm.URL == "" {
+		return fmt.Errorf("missing basic helm configurations: %v", []string{"repo", "url"})
 	}
 
 	if err := common.CleanBaseDir(cfg); err != nil {
@@ -33,6 +37,10 @@ func setupHelmRepo(name string, cfg *component.Component, keepTmp bool) error {
 	cmdArgs := []string{}
 	if cfg.Helm.CRDsChart == nil || cfg.Helm.CRDsChart.Chart == "" {
 		cmdArgs = append(cmdArgs, "--include-crds")
+	} else {
+		if err := processHelmChart(cfg.Name, cfg.Helm.CRDsChart, "crds", false); err != nil {
+			return err
+		}
 	}
 
 	namespace := component.GetComponentPrefix(name)
@@ -40,10 +48,6 @@ func setupHelmRepo(name string, cfg *component.Component, keepTmp bool) error {
 		namespace = cfg.Namespace
 	}
 	cmdArgs = append(cmdArgs, "-n", namespace)
-
-	if err := processHelmChart(cfg.Name, cfg.Helm.CRDsChart, "crds", false); err != nil {
-		return err
-	}
 
 	if err := processHelmChart(cfg.Name, cfg.Helm.Chart, "", keepTmp, cmdArgs...); err != nil {
 		return err
@@ -86,7 +90,7 @@ func processHookInit(cfg *component.HelmInitHooks) error {
 
 func processHelmChart(name string, chart *component.HelmChart, prefix string, keepTmp bool, args ...string) error {
 	if chart == nil || chart.Chart == "" {
-		return nil
+		return fmt.Errorf("missing chart name config")
 	}
 	if err := processHelmDefaults(chart, prefix); err != nil {
 		return err

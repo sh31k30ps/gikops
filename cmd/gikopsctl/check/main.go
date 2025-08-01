@@ -2,7 +2,6 @@ package check
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/sh31k30ps/gikopsctl/pkg/log"
 	"github.com/sh31k30ps/gikopsctl/pkg/tools"
@@ -21,13 +20,9 @@ func NewCommand(logger log.Logger) *cobra.Command {
 		Short: "Check the required tools",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			infos := tools.ListTools()
-			alternatives := []string{}
 			logger.V(0).Info("Tools:")
 			isFailure := false
 			for _, tool := range infos {
-				if slices.Contains(alternatives, tool.Name) {
-					continue
-				}
 				status := success
 				message := "up to date"
 
@@ -52,15 +47,12 @@ func NewCommand(logger log.Logger) *cobra.Command {
 				}
 
 				logger.V(0).Info(fmt.Sprintf("  %s %s: %s", status, tool.Name, message))
-				if tool.UseAlternative {
-					logger.V(0).Info(fmt.Sprintf("    	Alternative: %s", tool.ResolvedName))
+				if tool.Alternative != "" {
+					logger.V(0).Info(fmt.Sprintf("    	Alternative: %s", tool.Alternative))
 				}
 				if tool.IsInstalled {
 					logger.V(0).Info(fmt.Sprintf("    	Minimal version: %s", tool.MinVersion))
 					logger.V(0).Info(fmt.Sprintf("    	Current version: %s", tool.Version))
-				}
-				if len(tool.Alternatives) > 0 {
-					alternatives = append(alternatives, tool.Alternatives...)
 				}
 			}
 			if isFailure {
