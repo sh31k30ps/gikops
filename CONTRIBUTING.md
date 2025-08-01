@@ -15,3 +15,5 @@ make test
 # Run linting
 make lint
 ```
+
+To add Makefile capabilities follow [this document](./docs/MAKEFILE.md).

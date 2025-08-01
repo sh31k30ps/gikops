@@ -1,7 +1,7 @@
 # GikOps Controller
 
 <p align="center">
-    <picture>
+    <picture width="100">
       <source srcset="docs/assets/img/gikops.png">
       <img alt="Traefik" title="Traefik" src="docs/assets/img/gikops.png">
     </picture>
@@ -43,6 +43,12 @@ You can use command `gikopsctl check` to verify dependencies and versions.
   + Shell scripts execution during deployement phases. (before, after).
 - **Automatic tool verification**: Check external tools versions or alternatives.
 - **Shell Completion**: Get seamless completion for `gikopsctl` commands in your shell.
+
+## Summary
+
+- [Installation](#installation)
+- [Commands](./docs/CMDS.md)
+- [Config Files](./docs/CONFIG_FILES.md)
 
 ## Installation
 
