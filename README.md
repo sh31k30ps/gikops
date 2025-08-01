@@ -1,5 +1,12 @@
 # GikOps Controller
 
+<p align="center">
+    <picture>
+      <source srcset="docs/assets/img/gikops.png">
+      <img alt="Traefik" title="Traefik" src="docs/assets/img/gikops.png">
+    </picture>
+</p>
+
 GikOps is a tool that allows managing various Kubernetes clusters as well
 as the different tools and applications deployed on them.
 It enforces the GitOps principle by keeping all configurations in a versioned project.
@@ -15,6 +22,8 @@ compatibility issues.
 The following tools must be installed before using the tool:
 - kubectl
 - git
+- helm
+- kustomize
 
 The tool will verify these dependencies before running any command.
 You can use command `gikopsctl check` to verify dependencies and versions.
