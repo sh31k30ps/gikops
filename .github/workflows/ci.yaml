@@ -19,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.24'
 
       - name: Cache Go modules
         uses: actions/cache@v4
@@ -34,12 +34,15 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
 
-      - name: Generate deepcopy files
-        run: make generate
-
       - name: Lint
         run: make lint
 
+      - name: Install kubectl
+        uses: actions-hub/kubectl@master
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.3.0
+        
       - name: Run Tests
         run: make test
 
@@ -53,7 +56,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.24'
       - run: go mod tidy
       - run: make coverage
       - name: Upload Coverage Report
